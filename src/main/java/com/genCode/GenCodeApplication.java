@@ -48,7 +48,6 @@ public class GenCodeApplication {
                 XSSFSheet sheet = wb.getSheetAt(i);
                 XSSFRow row;
                 XSSFCell cell;
-                XSSFCell cellFirst;
                 int rows; // No of rows
                 rows = sheet.getPhysicalNumberOfRows();
                 sheetName = sheet.getSheetName();
@@ -56,13 +55,13 @@ public class GenCodeApplication {
                 int tmp = 0;
 
                 // This trick ensures that we get the data properly even if it doesn't start from first few rows
-//                for (int k = 0; k < 10 || k < rows; k++) {
-//                    row = sheet.getRow(k);
-//                    if (row != null) {
-//                        tmp = sheet.getRow(k).getPhysicalNumberOfCells();
-//                        if (tmp > cols) cols = tmp;
-//                    }
-//                }
+                for (int k = 0; k < 10 || k < rows; k++) {
+                    row = sheet.getRow(k);
+                    if (row != null) {
+                        tmp = sheet.getRow(k).getPhysicalNumberOfCells();
+                        if (tmp > cols) cols = tmp;
+                    }
+                }
 
                 //xu ly tung dong (bo qua dong header)
                 for (int r = 1; r < rows; r++) {
@@ -77,95 +76,143 @@ public class GenCodeApplication {
                         for (int c = 0; c < cols; c++) {
                             cell = row.getCell((short) c);
                             if (sheetName.equals("Modules")) {
-                                if (c == 0) {
-                                    moduleDto.setIsActive(formatter.formatCellValue(cell));
-                                } else if (c == 1) {
-                                    moduleDto.setNameEn(formatter.formatCellValue(cell));
-                                } else if (c == 2) {
-                                    moduleDto.setNameVi(formatter.formatCellValue(cell));
-                                } else if (c == 3) {
-                                    moduleDto.setPort(formatter.formatCellValue(cell));
-                                } else if (c == 4) {
-                                    moduleDto.setPrefix(formatter.formatCellValue(cell));
+                                switch (c) {
+                                    case 0:
+                                        moduleDto.setIsActive(formatter.formatCellValue(cell));
+                                        break;
+                                    case 1:
+                                        moduleDto.setNameEn(formatter.formatCellValue(cell));
+                                        break;
+                                    case 2:
+                                        moduleDto.setNameVi(formatter.formatCellValue(cell));
+                                        break;
+                                    case 3:
+                                        moduleDto.setPort(formatter.formatCellValue(cell));
+                                        break;
+                                    case 4:
+                                        moduleDto.setPrefix(formatter.formatCellValue(cell));
+                                        break;
+                                    default: {
+                                    }
                                 }
                                 if (c + 1 == cols) {
                                     moduleDtos.add(moduleDto);
                                 }
                             } else if (sheetName.equals("Entities")) {
-                                if (c == 0) {
-                                    entitiesDto.setIsActive(formatter.formatCellValue(cell));
-                                } else if (c == 1) {
-                                    entitiesDto.setEntityKey(cell.getStringCellValue());
-                                } else if (c == 2) {
-                                    entitiesDto.setModule(formatter.formatCellValue(cell));
-                                } else if (c == 3) {
-                                    entitiesDto.setNameProperty(formatter.formatCellValue(cell));
-                                } else if (c == 4) {
-                                    entitiesDto.setNameColumn(formatter.formatCellValue(cell));
-                                } else if (c == 5) {
-                                    entitiesDto.setNameDisplay(formatter.formatCellValue(cell));
-                                } else if (c == 6) {
-                                    entitiesDto.setTableName(formatter.formatCellValue(cell));
-                                } else if (c == 7) {
-                                    entitiesDto.setGenCtrl(formatter.formatCellValue(cell));
-                                } else if (c == 8) {
-                                    entitiesDto.setGenEntity(formatter.formatCellValue(cell));
-                                } else if (c == 9) {
-                                    entitiesDto.setGenService(formatter.formatCellValue(cell));
-                                } else if (c == 10) {
-                                    entitiesDto.setGenRepo(formatter.formatCellValue(cell));
+                                switch (c) {
+                                    case 0:
+                                        entitiesDto.setIsActive(formatter.formatCellValue(cell));
+                                        break;
+                                    case 1:
+                                        entitiesDto.setEntityKey(cell.getStringCellValue());
+                                        break;
+                                    case 2:
+                                        entitiesDto.setModule(formatter.formatCellValue(cell));
+                                        break;
+                                    case 3:
+                                        entitiesDto.setNameProperty(formatter.formatCellValue(cell));
+                                        break;
+                                    case 4:
+                                        entitiesDto.setNameColumn(formatter.formatCellValue(cell));
+                                        break;
+                                    case 5:
+                                        entitiesDto.setNameDisplay(formatter.formatCellValue(cell));
+                                        break;
+                                    case 6:
+                                        entitiesDto.setTableName(formatter.formatCellValue(cell));
+                                        break;
+                                    case 7:
+                                        entitiesDto.setGenCtrl(formatter.formatCellValue(cell));
+                                        break;
+                                    case 8:
+                                        entitiesDto.setGenEntity(formatter.formatCellValue(cell));
+                                        break;
+                                    case 9:
+                                        entitiesDto.setGenService(formatter.formatCellValue(cell));
+                                        break;
+                                    case 10:
+                                        entitiesDto.setGenRepo(formatter.formatCellValue(cell));
+                                        break;
+                                    default: {
+                                    }
                                 }
                                 if (c + 1 == cols) {
                                     entitiesDtos.add(entitiesDto);
                                 }
                             } else if (sheetName.equals("Properties")) {
-                                if (c == 0) {
-                                    propertiesDto.setModule(cell.getStringCellValue());
-                                } else if (c == 1) {
-                                    propertiesDto.setEntityKey(cell.getStringCellValue());
-                                } else if (c == 2) {
-                                    propertiesDto.setNameProperty(formatter.formatCellValue(cell));
-                                } else if (c == 3) {
-                                    propertiesDto.setNameColumn(formatter.formatCellValue(cell));
-                                } else if (c == 4) {
-                                    propertiesDto.setNameDisplay(formatter.formatCellValue(cell));
-                                } else if (c == 5) {
-                                    propertiesDto.setType(formatter.formatCellValue(cell));
-                                } else if (c == 6) {
-                                    propertiesDto.setRefType(formatter.formatCellValue(cell));
-                                } else if (c == 7) {
-                                    propertiesDto.setRequired(formatter.formatCellValue(cell));
-                                } else if (c == 8) {
-                                    propertiesDto.setMin(formatter.formatCellValue(cell));
-                                } else if (c == 9) {
-                                    propertiesDto.setMax(formatter.formatCellValue(cell));
-                                } else if (c == 10) {
-                                    propertiesDto.setPattern(formatter.formatCellValue(cell));
-                                } else if (c == 11) {
-                                    propertiesDto.setToString(formatter.formatCellValue(cell));
-                                } else if (c == 12) {
-                                    propertiesDto.setShowOnTable(formatter.formatCellValue(cell));
-                                } else if (c == 13) {
-                                    propertiesDto.setCanAdd(formatter.formatCellValue(cell));
-                                } else if (c == 14) {
-                                    propertiesDto.setCanUpdate(formatter.formatCellValue(cell));
-                                } else if (c == 15) {
-                                    propertiesDto.setCanFilter(formatter.formatCellValue(cell));
-                                } else if (c == 16) {
-                                    propertiesDto.setCanSort(formatter.formatCellValue(cell));
-                                } else if (c == 17) {
-                                    propertiesDto.setCanFilterBy(formatter.formatCellValue(cell));
+                                switch (c) {
+                                    case 0:
+                                        propertiesDto.setModule(cell.getStringCellValue());
+                                        break;
+                                    case 1:
+                                        propertiesDto.setEntityKey(cell.getStringCellValue());
+                                        break;
+                                    case 2:
+                                        propertiesDto.setNameProperty(formatter.formatCellValue(cell));
+                                        break;
+                                    case 3:
+                                        propertiesDto.setNameColumn(formatter.formatCellValue(cell));
+                                        break;
+                                    case 4:
+                                        propertiesDto.setNameDisplay(formatter.formatCellValue(cell));
+                                        break;
+                                    case 5:
+                                        propertiesDto.setType(formatter.formatCellValue(cell));
+                                        break;
+                                    case 6:
+                                        propertiesDto.setRefType(formatter.formatCellValue(cell));
+                                        break;
+                                    case 7:
+                                        propertiesDto.setRequired(formatter.formatCellValue(cell));
+                                        break;
+                                    case 8:
+                                        propertiesDto.setMin(formatter.formatCellValue(cell));
+                                        break;
+                                    case 9:
+                                        propertiesDto.setMax(formatter.formatCellValue(cell));
+                                        break;
+                                    case 10:
+                                        propertiesDto.setPattern(formatter.formatCellValue(cell));
+                                        break;
+                                    case 11:
+                                        propertiesDto.setToString(formatter.formatCellValue(cell));
+                                        break;
+                                    case 12:
+                                        propertiesDto.setShowOnTable(formatter.formatCellValue(cell));
+                                        break;
+                                    case 13:
+                                        propertiesDto.setCanAdd(formatter.formatCellValue(cell));
+                                        break;
+                                    case 14:
+                                        propertiesDto.setCanUpdate(formatter.formatCellValue(cell));
+                                        break;
+                                    case 15:
+                                        propertiesDto.setCanFilter(formatter.formatCellValue(cell));
+                                        break;
+                                    case 16:
+                                        propertiesDto.setCanSort(formatter.formatCellValue(cell));
+                                        break;
+                                    case 17:
+                                        propertiesDto.setCanFilterBy(formatter.formatCellValue(cell));
+                                        break;
+                                    default: {
+                                    }
                                 }
                                 if (c + 1 == cols) {
                                     propertiesDtos.add(propertiesDto);
                                 }
-                            }else if (sheetName.equals("Validations")) {
-                                if (c == 0) {
-                                    validationDto.setNameEn(formatter.formatCellValue(cell));
-                                } else if (c == 1) {
-                                    validationDto.setNameVi(formatter.formatCellValue(cell));
-                                } else if (c == 2) {
-                                    validationDto.setValue(formatter.formatCellValue(cell));
+                            } else if (sheetName.equals("Validations")) {
+                                switch (c) {
+                                    case 0:
+                                        validationDto.setNameEn(formatter.formatCellValue(cell));
+                                        break;
+                                    case 1:
+                                        validationDto.setNameVi(formatter.formatCellValue(cell));
+                                        break;
+                                    case 2:
+                                        validationDto.setValue(formatter.formatCellValue(cell));
+                                    default: {
+                                    }
                                 }
                                 if (c + 1 == cols) {
                                     validationDtos.add(validationDto);
