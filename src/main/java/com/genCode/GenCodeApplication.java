@@ -250,7 +250,7 @@ public class GenCodeApplication {
 
     private static void exportFile(String fileName, String contentFile) throws IOException {
         //tao package neu chưa có
-        String desktopPath = FileSystemView.getFileSystemView().getHomeDirectory() + "/Desktop";
+        String desktopPath = FileSystemView.getFileSystemView().getHomeDirectory() + "/Desktop/";
         String packagePath = desktopPath + basePackage.replace(".", "/");
         File packageDir = new File(packagePath);
         if (packageDir.exists()) {
