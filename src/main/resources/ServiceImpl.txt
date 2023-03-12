@@ -1,0 +1,112 @@
+package ${base.basePackage}.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ${base.basePackage}.common.data.service.BaseJdbcServiceImpl;
+import ${base.basePackage}.common.util.CommonUtil;
+import ${base.basePackage}.common.util.SearchUtil;
+import ${base.basePackage}.dto.${mdl.name}Dto;
+import ${base.basePackage}.entity.${mdl.name};
+import ${base.basePackage}.repo.${mdl.name}Repo;
+
+import javax.persistence.EntityManager;
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional
+public class ${mdl.name}ServiceImpl extends BaseJdbcServiceImpl<${mdl.name}, String> implements ${mdl.name}Service {
+
+    private final Logger log = LoggerFactory.getLogger(${mdl.name}ServiceImpl.class);
+
+    private ${mdl.name}Repo ${mdl.name}Repo;
+
+    public ${mdl.name}ServiceImpl(DataSource dataSource, EntityManager entityManager, Class<${mdl.name}> entityClass) {
+        super(dataSource, entityManager, ${mdl.name}.class);
+        this.${mdl.name}Repo = ${mdl.name}Repo;
+    }
+
+
+    @Override
+    public String create(${mdl.name}Request request) {
+        log.debug("Request to save ${mdl.name} : {}", request);
+        ${mdl.name} ett = new ${mdl.name}();
+        BeanUtils.copyProperties(request, ett);
+        ett.setId(UUID.randomUUID().toString());
+        ${mdl.name}Repo.save(ett);
+        return ett.getId();
+    }
+
+    @Override
+    public ${mdl.name}Dto update(${mdl.name}Request request) {
+        log.debug("Request to update ${mdl.name} : {}", request);
+        ${mdl.name} ett = new ${mdl.name}();
+        BeanUtils.copyProperties(request, ett);
+        ${mdl.name}Repo.save(ett);
+        return request;
+    }
+
+    @Override
+    public List<${mdl.name}Dto> advancedSearch(${mdl.name}Request request, Pageable pageable) {
+        log.debug("Request to search ${mdl.name} : {}", request);
+        List<Specification<${mdl.name}>> list = getAdvanceSearchSpecList(request);
+        Page<${mdl.name}> page;
+        if(!CommonUtil.listIsEmptyOrNull(list)){
+            Specification<${mdl.name}> spec = list.get(0);
+            for (int i = 1; i < list.size(); i++) {
+                spec = spec.and(list.get(i));
+            }
+            page = $textUtils.wordsToCamel(${mdl.name}).concat("").concat("Repo.findAll(spec, pageable);")
+        } else {
+            page = $textUtils.wordsToCamel(${mdl.name}).concat("").concat("Repo.findAll(pageable);")
+        }
+        if (page.getTotalElements() > 0) {
+            return page.map(existing -> {
+                ${mdl.name}Dto dto = new ${mdl.name}Dto();
+                try {
+                    BeanUtils.copyProperties(existing, dto);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return dto;
+            }).stream().collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private List<Specification<${mdl.name}>> getAdvanceSearchSpecList(
+            ${mdl.name}Request request) {
+        List<Specification<${mdl.name}>> spec = new ArrayList<>();
+        #foreach($model in $models)
+        #if($model.module == ${mdl.name} && $model.isRequest == 'TRUE' && $model.notNull == 'TRUE')
+        if (!CommonUtil.isNullOrEmpty(request.get$textUtils.wordsToCamelFirstUpper(${model.fieldCamel})())) {
+             spec.add(SearchUtil.eq("$model.fieldCamel", request.get$textUtils.wordsToCamelFirstUpper(${model.fieldCamel})()));
+         }
+        #end
+        #end
+
+        return spec;
+    }
+
+    @Override
+    public void delete(String id) {
+        log.debug("Request to delete ${mdl.name} : {}", id);
+        ${mdl.name}Repo.deleteById(id);
+    }
+
+    @Override
+    public void approve(String id) {
+        log.debug("Request to approve ${mdl.name} : {}", id);
+    }
+}

@@ -1,0 +1,28 @@
+package ${base.basePackage}.entity;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+
+import ${base.basePackage}.model.common.EntityBase;
+
+@Getter
+@Setter
+@Entity(name = "${mdl.name}")
+@Table(name = "${mdl.nameUpperSnake}")
+public class ${mdl.name}Entity extends EntityBase implements Serializable {
+   private static final long serialVersionUID = 1L;
+#foreach($model in $models)
+    #if($model.module == ${mdl.name} && $model.isEntity == 'TRUE')
+
+    #if($model.type == 'Date')
+    @Temporal(TemporalType.DATE)
+    #end
+    @Column(name = "${model.fieldUpperSnake}")
+    private ${model.type} ${model.fieldCamel};
+    #end
+#end
+}

@@ -1,0 +1,43 @@
+package ${base.basePackage}.${mdl.name};
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import ${base.basePackage}.common.util.RequestUtil;
+import ${base.basePackage}.model.dto.SuccessResponse;
+import ${base.basePackage}.dto.${mdl.name}RequestDto;
+import ${base.basePackage}.service.${mdl.name}Service;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("${mdl.requestMapping}")
+@Tag(name = "${mdl.name} Controller")
+public class ${mdl.name}Ctrl {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private ${mdl.name}Service ${mdl.name}Service;
+#foreach($api in $apis)
+    #if($api.key == 'ApiCreate')
+
+    @${api.getMethod()}Mapping("/create")
+    @ApiOperation("Create ${api.getModule()}")
+    public SuccessResponse<${api.output}> create(@RequestBody ${api.getModule()}Request request) {
+        return RequestUtil.ok(${api.getModule()}Service.create(request));
+    }
+    #elseif($api.key == 'ApiUpdate')
+
+    @${api.getMethod()}Mapping("/update")
+    @ApiOperation("Update ${api.getModule()}")
+    public SuccessResponse<${api.output}> update(@RequestBody ${api.getModule()}Request request) {
+        return RequestUtil.ok(${api.getModule()}Service.update(request));
+    }
+    #end
+#end
+
+}

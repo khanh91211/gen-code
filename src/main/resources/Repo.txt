@@ -1,0 +1,11 @@
+package ${base.basePackage}.repo;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.stereotype.Repository;
+import ${base.basePackage}.entity.${mdl.name};
+
+@Repository
+public interface ${mdl.name}Repo extends JpaRepository<${mdl.name}, String> , JpaSpecificationExecutor<${mdl.name}>{
+
+}

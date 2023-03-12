@@ -1,0 +1,19 @@
+package ${base.basePackage}.service;
+
+import org.springframework.data.domain.Pageable;
+import ${base.basePackage}.dto.${mdl.name}Dto;
+import ${base.basePackage}.dto.${mdl.name}Request;
+
+import java.util.List;
+
+public interface ${mdl.name}Service {
+    String create(${mdl.name}Request request);
+
+    ${mdl.name}Dto update(${mdl.name}Dto request);
+
+    List<${mdl.name}Dto> advancedSearch(${mdl.name}Request request, Pageable pageable);
+
+    void delete(String id);
+
+    void approve(String id);
+}
