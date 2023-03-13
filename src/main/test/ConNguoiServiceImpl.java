@@ -50,8 +50,11 @@ public class ConNguoiServiceImpl extends BaseJdbcServiceImpl<ConNguoi, String> i
     }
 
     @Override
-    public ConNguoiDTO update(ConNguoiDTO request) {
+    public ConNguoiDTO update(ConNguoiDTO request) throws BaseException{
         log.debug("Request to update ConNguoi : {}", request);
+        if (CommonUtil.isNullOrEmpty(id)) {
+            throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, id, null);
+        }
         ConNguoi ett = new ConNguoi();
         BeanUtils.copyProperties(request, ett);
         conNguoiRepository.save(ett);

@@ -1,4 +1,4 @@
-package ${base.basePackage}.dto;
+package ${basePackage}.${mdlNameLower}.${ettNameLower}.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,16 +9,14 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class ${mdl.name}Dto implements Serializable {
+public class ${ettNamePpt}Dto implements Serializable {
     private static final long serialVersionUID = 1L;
-#foreach($model in $models)
-    #if($model.module == ${mdl.name})
-
-    #if($model.notNull == 'TRUE')
-    @NotNull
-    #end
-    private ${model.type} ${model.fieldCamel};
-    #end
+#foreach($ppt in $ppts)
+#if($ppt.type == 'id' && $ptt.refType != '')
+    private String $textUtils.wordsToCamel(${ppt.nameProperty});
+#else
+    private ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty});
+#end
 #end
 
 }

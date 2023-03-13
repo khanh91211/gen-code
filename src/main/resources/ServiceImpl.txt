@@ -1,4 +1,4 @@
-package ${base.basePackage}.service;
+package ${basePackage}.${mdlNameLower}.${ettNameLower}.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,12 +8,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ${base.basePackage}.common.data.service.BaseJdbcServiceImpl;
-import ${base.basePackage}.common.util.CommonUtil;
-import ${base.basePackage}.common.util.SearchUtil;
-import ${base.basePackage}.dto.${mdl.name}Dto;
-import ${base.basePackage}.entity.${mdl.name};
-import ${base.basePackage}.repo.${mdl.name}Repo;
+import ${basePackage}.model.enumeration.ErrorEnum;
+import ${basePackage}.common.exception.BaseException;
+import ${basePackage}.common.data.service.BaseJdbcServiceImpl;
+import ${basePackage}.common.util.CommonUtil;
+import ${basePackage}.common.util.SearchUtil;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Dto;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Request;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.entity.${ettNamePpt};
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.repo.${ettNamePpt}Repo;
 
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
@@ -25,54 +28,56 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class ${mdl.name}ServiceImpl extends BaseJdbcServiceImpl<${mdl.name}, String> implements ${mdl.name}Service {
+public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt}, String> implements ${ettNamePpt}Service {
 
-    private final Logger log = LoggerFactory.getLogger(${mdl.name}ServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(${ettNamePpt}ServiceImpl.class);
 
-    private ${mdl.name}Repo ${mdl.name}Repo;
+    private ${ettNamePpt}Repo ${ettNameCamel}Repo;
 
-    public ${mdl.name}ServiceImpl(DataSource dataSource, EntityManager entityManager, Class<${mdl.name}> entityClass) {
-        super(dataSource, entityManager, ${mdl.name}.class);
-        this.${mdl.name}Repo = ${mdl.name}Repo;
+    public ${ettNamePpt}ServiceImpl(DataSource dataSource, EntityManager entityManager, ${ettNamePpt}Repo ${ettNameCamel}Repo) {
+        super(dataSource, entityManager, ${ettNamePpt}.class);
+        this.${ettNameCamel}Repo = ${ettNameCamel}Repo;
     }
 
 
     @Override
-    public String create(${mdl.name}Request request) {
-        log.debug("Request to save ${mdl.name} : {}", request);
-        ${mdl.name} ett = new ${mdl.name}();
+    public String create(${ettNamePpt}Request request) {
+        log.debug("Request to save ${ettNamePpt} : {}", request);
+        ${ettNamePpt} ett = new ${ettNamePpt}();
         BeanUtils.copyProperties(request, ett);
         ett.setId(UUID.randomUUID().toString());
-        ${mdl.name}Repo.save(ett);
+        ${ettNameCamel}Repo.save(ett);
         return ett.getId();
     }
 
     @Override
-    public ${mdl.name}Dto update(${mdl.name}Request request) {
-        log.debug("Request to update ${mdl.name} : {}", request);
-        ${mdl.name} ett = new ${mdl.name}();
+    public void update(${ettNamePpt}Request request) throws BaseException {
+        log.debug("Request to update ${ettNamePpt} : {}", request);
+        if (CommonUtil.isNullOrEmpty(request.getId())) {
+            throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, request.getId(), null);
+        }
+        ${ettNamePpt} ett = new ${ettNamePpt}();
         BeanUtils.copyProperties(request, ett);
-        ${mdl.name}Repo.save(ett);
-        return request;
+        ${ettNameCamel}Repo.save(ett);
     }
 
     @Override
-    public List<${mdl.name}Dto> advancedSearch(${mdl.name}Request request, Pageable pageable) {
-        log.debug("Request to search ${mdl.name} : {}", request);
-        List<Specification<${mdl.name}>> list = getAdvanceSearchSpecList(request);
-        Page<${mdl.name}> page;
+    public List<${ettNamePpt}Dto> advancedSearch(${ettNamePpt}Request request, Pageable pageable) {
+        log.debug("Request to search ${ettNamePpt} : {}", request);
+        List<Specification<${ettNamePpt}>> list = getAdvanceSearchSpecList(request);
+        Page<${ettNamePpt}> page;
         if(!CommonUtil.listIsEmptyOrNull(list)){
-            Specification<${mdl.name}> spec = list.get(0);
+            Specification<${ettNamePpt}> spec = list.get(0);
             for (int i = 1; i < list.size(); i++) {
                 spec = spec.and(list.get(i));
             }
-            page = $textUtils.wordsToCamel(${mdl.name}).concat("").concat("Repo.findAll(spec, pageable);")
+            page = $textUtils.wordsToCamel(${ett.nameProperty}).concat("").concat("Repo.findAll(spec, pageable);")
         } else {
-            page = $textUtils.wordsToCamel(${mdl.name}).concat("").concat("Repo.findAll(pageable);")
+            page = $textUtils.wordsToCamel(${ett.nameProperty}).concat("").concat("Repo.findAll(pageable);")
         }
         if (page.getTotalElements() > 0) {
             return page.map(existing -> {
-                ${mdl.name}Dto dto = new ${mdl.name}Dto();
+                ${ettNamePpt}Dto dto = new ${ettNamePpt}Dto();
                 try {
                     BeanUtils.copyProperties(existing, dto);
                 } catch (Exception e) {
@@ -85,28 +90,40 @@ public class ${mdl.name}ServiceImpl extends BaseJdbcServiceImpl<${mdl.name}, Str
         }
     }
 
-    private List<Specification<${mdl.name}>> getAdvanceSearchSpecList(
-            ${mdl.name}Request request) {
-        List<Specification<${mdl.name}>> spec = new ArrayList<>();
-        #foreach($model in $models)
-        #if($model.module == ${mdl.name} && $model.isRequest == 'TRUE' && $model.notNull == 'TRUE')
-        if (!CommonUtil.isNullOrEmpty(request.get$textUtils.wordsToCamelFirstUpper(${model.fieldCamel})())) {
-             spec.add(SearchUtil.eq("$model.fieldCamel", request.get$textUtils.wordsToCamelFirstUpper(${model.fieldCamel})()));
-         }
-        #end
-        #end
-
+    private List<Specification<${ettNamePpt}>> getAdvanceSearchSpecList(
+            ${ettNamePpt}Request request) {
+        List<Specification<${ettNamePpt}>> spec = new ArrayList<>();
+#foreach($ppt in $ppts)
+#if($ppt.required == 'TRUE')
+#if($ppt.type == 'String')
+        if (!CommonUtil.isNullOrEmpty(request.get$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})())) {
+             spec.add(SearchUtil.eq("$textUtils.wordsToCamel(${ppt.nameProperty})", request.get$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})()));
+        }
+#else
+        if (request.get$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})() != null) {
+             spec.add(SearchUtil.eq("$textUtils.wordsToCamel(${ppt.nameProperty})", request.get$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})()));
+        }
+#end
+#end
+#end
         return spec;
     }
 
     @Override
-    public void delete(String id) {
-        log.debug("Request to delete ${mdl.name} : {}", id);
-        ${mdl.name}Repo.deleteById(id);
+    public void delete(String id) throws BaseException {
+        log.debug("Request to delete ${ettNamePpt} : {}", id);
+        if (CommonUtil.isNullOrEmpty(id)) {
+            throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, id, null);
+        }
+        ${ettNameCamel}Repo.deleteById(id);
     }
 
     @Override
-    public void approve(String id) {
-        log.debug("Request to approve ${mdl.name} : {}", id);
+    public void approve(String id) throws BaseException {
+        log.debug("Request to approve ${ettNamePpt} : {}", id);
+        if (CommonUtil.isNullOrEmpty(id)) {
+            throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, id, null);
+        }
+        //$textUtils.wordsToCamel(${ett.nameProperty}).concat("").concat("Repo.approve(null, id);")
     }
 }

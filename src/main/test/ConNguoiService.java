@@ -10,7 +10,7 @@ import java.util.List;
 public interface ConNguoiService { //extends BaseJdbcService<User, String>
     String create(ConNguoiDTO request);
 
-    ConNguoiDTO update(ConNguoiDTO request);
+    ConNguoiDTO update(ConNguoiDTO request) throws BaseException;
 
     List<ConNguoiDTO> advancedSearch(ConNguoiDTO request, Pageable pageable);
 

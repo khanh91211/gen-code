@@ -1,19 +1,20 @@
-package ${base.basePackage}.service;
+package ${basePackage}.${mdlNameLower}.${ettNameLower}.service;
 
 import org.springframework.data.domain.Pageable;
-import ${base.basePackage}.dto.${mdl.name}Dto;
-import ${base.basePackage}.dto.${mdl.name}Request;
+import ${basePackage}.common.exception.BaseException;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Dto;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Request;
 
 import java.util.List;
 
-public interface ${mdl.name}Service {
-    String create(${mdl.name}Request request);
+public interface ${ettNamePpt}Service {
+    String create(${ettNamePpt}Request request);
 
-    ${mdl.name}Dto update(${mdl.name}Dto request);
+    void update(${ettNamePpt}Request request) throws BaseException;
 
-    List<${mdl.name}Dto> advancedSearch(${mdl.name}Request request, Pageable pageable);
+    List<${ettNamePpt}Dto> advancedSearch(${ettNamePpt}Request request, Pageable pageable);
 
-    void delete(String id);
+    void delete(String id) throws BaseException;
 
-    void approve(String id);
+    void approve(String id) throws BaseException;
 }

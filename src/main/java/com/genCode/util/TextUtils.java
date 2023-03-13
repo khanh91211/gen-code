@@ -36,6 +36,12 @@ public class TextUtils {
     return adjOutput(t);
   }
 
+  public static String wordsToLowerCase(String words) {
+    String t = words.replace(" ", "");
+    t = t.toLowerCase();
+    return adjOutput(t);
+  }
+
   public static String wordsToSnakeLower(String words) {
     return adjOutput(words.replace(" ", "_").toLowerCase());
   }

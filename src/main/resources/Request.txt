@@ -1,23 +1,40 @@
-package ${base.basePackage}.dto;
+package ${basePackage}.${mdlNameLower}.${ettNameLower}.dto;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
 
 @Getter
 @Setter
-public class ${mdl.name}Request {
-#foreach($model in $models)
-    #if($model.module == ${mdl.name} && $model.isRequest == 'TRUE')
-
-    #if($model.notNull == 'TRUE')
+public class ${ettNamePpt}Request {
+#foreach($ppt in $ppts)
+#if($ppt.min != '' && $ppt.max != '')
+    @Size(min = ${ppt.min}, max = ${ppt.max})
+#elseif($ppt.min != '')
+    @Size(min = ${ppt.min})
+#elseif($ppt.max != '')
+    @Size(max = ${ppt.max})
+#end
+#if($ppt.required == 'TRUE')
     @NotNull
-    #end
-    private ${model.type} ${model.fieldCamel};
-    #end
+#end
+#if($ppt.pattern != '')
+#foreach($vl in $vld)
+#if($vl.nameEn == ${ppt.pattern})
+    @Pattern(regexp = "$vl.value", message = "")
+#end
+#end
+#end
+#if($ppt.type == 'id' && $ptt.refType != '')
+    private String $textUtils.wordsToCamel(${ppt.nameProperty});
+#else
+    private ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty});
+#end
 #end
 
 }

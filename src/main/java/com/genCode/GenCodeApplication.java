@@ -24,6 +24,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 public class GenCodeApplication {
@@ -230,28 +231,80 @@ public class GenCodeApplication {
 
     private static void updateContent(List<EntitiesDto> entitiesDtos, List<ModuleDto> moduleDtos, List<PropertiesDto> propertiesDtos, List<ValidationDto> validationDtos) throws IOException, NoSuchMethodException {
         for (ModuleDto mdl : moduleDtos) {
-            for (EntitiesDto ett : entitiesDtos) {
-                VelocityContext context = new VelocityContext();
-                context.put("basePackage", basePackage);
-                context.put("mdl", mdl);
-                context.put("ett", ett);
-                context.put("vld", validationDtos);
-                context.put("textUtils", new TextUtils());
+            if ("TRUE".equals(mdl.getIsActive())) {
+                List<EntitiesDto> listEntityModule = entitiesDtos.stream().filter(c -> c.getModule().equals(mdl.getNameEn())).collect(Collectors.toList());
+                for (EntitiesDto ett : listEntityModule) {
+                    String ettNameLower = TextUtils.wordsToLowerCase(ett.getNameProperty());
+                    String mdlNameLower = TextUtils.wordsToLowerCase(mdl.getNameEn());
+                    VelocityContext context = new VelocityContext();
+                    context.put("basePackage", basePackage);
+                    context.put("mdlNameLower", mdlNameLower);
+                    context.put("ettNameLower", ettNameLower);
+                    context.put("ettNamePpt", TextUtils.wordsToCamelFirstUpper(ett.getNameProperty()));
+                    context.put("ettRequestMapping", TextUtils.wordsToKebabLower(ett.getNameProperty()));
+                    context.put("ettNameCamel", TextUtils.wordsToCamel(ett.getNameProperty()));
 
-                // Xử lý template
-                StringWriter writer = new StringWriter();
-                Velocity.evaluate(context, writer, "genCode", readResource("Ctrl" + ".txt", Charsets.UTF_8));
+                    context.put("mdl", mdl);
+                    context.put("ett", ett);
+                    List<PropertiesDto> listProEntityModule = propertiesDtos.stream().filter(c -> c.getModule().equals(mdl.getNameEn()) && c.getEntityKey().equals(ett.getEntityKey())).collect(Collectors.toList());
+                    context.put("ppts", listProEntityModule);
+                    context.put("vld", validationDtos);
+                    context.put("textUtils", new TextUtils());
 
-                // In kết quả
-                exportFile(TextUtils.wordsToNoSpace(mdl.getNameEn()), writer.toString());
+                    // Xử lý template
+                    String typeClass = "";
+                    if ("TRUE".equals(ett.getGenCtrl())) {
+                        typeClass = "Ctrl";
+                        StringWriter writer = new StringWriter();
+                        Velocity.evaluate(context, writer, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                        // In kết quả
+                        exportFile(mdlNameLower,ettNameLower, typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getNameProperty()) + typeClass, writer.toString());
+                    }
+                    if ("TRUE".equals(ett.getGenEntity())) {
+                        typeClass = "Entity";
+                        StringWriter writer = new StringWriter();
+                        Velocity.evaluate(context, writer, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                        // In kết quả
+                        exportFile(mdlNameLower,ettNameLower, typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getNameProperty()), writer.toString());
+                        typeClass = "Dto";
+                        StringWriter writerDto = new StringWriter();
+                        Velocity.evaluate(context, writerDto, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                        // In kết quả
+                        exportFile(mdlNameLower,ettNameLower, typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getNameProperty()) + typeClass, writerDto.toString());
+                        typeClass = "Request";
+                        StringWriter writerRq = new StringWriter();
+                        Velocity.evaluate(context, writerRq, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                        // In kết quả
+                        exportFile(mdlNameLower,ettNameLower, "dto".toLowerCase(), TextUtils.wordsToNoSpace(ett.getNameProperty()) + typeClass, writerRq.toString());
+                    }
+                    if ("TRUE".equals(ett.getGenService())) {
+                        typeClass = "Service";
+                        StringWriter writer = new StringWriter();
+                        Velocity.evaluate(context, writer, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                        // In kết quả
+                        exportFile(mdlNameLower,ettNameLower, typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getNameProperty()) + typeClass, writer.toString());
+                        typeClass = "ServiceImpl";
+                        StringWriter writerImpl = new StringWriter();
+                        Velocity.evaluate(context, writerImpl, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                        // In kết quả
+                        exportFile(mdlNameLower,ettNameLower, "Service".toLowerCase(), TextUtils.wordsToNoSpace(ett.getNameProperty()) + typeClass, writerImpl.toString());
+                    }
+                    if ("TRUE".equals(ett.getGenRepo())) {
+                        typeClass = "Repo";
+                        StringWriter writer = new StringWriter();
+                        Velocity.evaluate(context, writer, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                        // In kết quả
+                        exportFile(mdlNameLower,ettNameLower, typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getNameProperty()) + typeClass, writer.toString());
+                    }
+                }
             }
         }
     }
 
-    private static void exportFile(String fileName, String contentFile) throws IOException {
+    private static void exportFile(String moduleName,String packageName, String packageClassName, String fileName, String contentFile) throws IOException {
         //tao package neu chưa có
         String desktopPath = FileSystemView.getFileSystemView().getHomeDirectory() + "/Desktop/";
-        String packagePath = desktopPath + basePackage.replace(".", "/");
+        String packagePath = desktopPath + basePackage.replace(".", "/") + "/" + moduleName + "/" + packageName+"/"+packageClassName;
         File packageDir = new File(packagePath);
         if (packageDir.exists()) {
             System.out.println("Package directory already exists: " + packagePath);
@@ -261,7 +314,8 @@ public class GenCodeApplication {
         }
 
         //export file code
-        String sourcePath = packagePath + "/" + fileName + ".java";
+        String sourcePath = packagePath
+                + "/" + fileName + ".java";
         try (FileOutputStream fos = new FileOutputStream(sourcePath)) {
             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
             osw.write(contentFile);

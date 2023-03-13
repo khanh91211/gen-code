@@ -37,8 +37,9 @@ public class ConNguoiController {
 
     @PutMapping("/update")
     @ApiOperation("Update con nguoi")
-    public SuccessResponse<ConNguoiDTO> update(@RequestBody ConNguoiDTO request) {
-        return RequestUtil.ok(conNguoiService.update(request));
+    public SuccessResponse update(@RequestBody ConNguoiDTO request) throws BaseException{
+        conNguoiService.update(request)
+        return new SuccessResponse();
     }
 
     @PostMapping("/search")
@@ -56,20 +57,20 @@ public class ConNguoiController {
     @ApiOperation("Delete con nguoi")
     public SuccessResponse delete(@PathVariable String id) throws BaseException {
         conNguoiService.delete(id);
-        return RequestUtil.ok("OK");
+        return new SuccessResponse();
     }
 
     @PutMapping("/approve/{id}")
     @ApiOperation("Duyet con nguoi")
     public SuccessResponse approve(@PathVariable String id) throws BaseException {
         conNguoiService.approve(id);
-        return RequestUtil.ok("OK");
+        return new SuccessResponse();
     }
 
     @GetMapping("/nghe-nghiep/{id}")
     @ApiOperation("Lay thong tin nghe nghiep cua con nguoi")
     public SuccessResponse getInfo(@PathVariable String id) throws BaseException {
         conNguoiService.approve(id);
-        return RequestUtil.ok("OK");
+        return new SuccessResponse();
     }
 }

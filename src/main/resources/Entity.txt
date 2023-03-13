@@ -1,4 +1,4 @@
-package ${base.basePackage}.entity;
+package ${basePackage}.${mdlNameLower}.${ettNameLower}.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,22 +7,24 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
-import ${base.basePackage}.model.common.EntityBase;
+import ${basePackage}.model.common.EntityBase;
 
 @Getter
 @Setter
-@Entity(name = "${mdl.name}")
-@Table(name = "${mdl.nameUpperSnake}")
-public class ${mdl.name}Entity extends EntityBase implements Serializable {
+@Entity(name = "${ettNamePpt}")
+@Table(name = "$textUtils.wordsToSnakeUpper(${mdl.prefix}).concat("_").concat($textUtils.wordsToSnakeUpper(${ett.nameProperty}))")
+public class ${ettNamePpt} extends EntityBase implements Serializable {
    private static final long serialVersionUID = 1L;
-#foreach($model in $models)
-    #if($model.module == ${mdl.name} && $model.isEntity == 'TRUE')
-
-    #if($model.type == 'Date')
+#foreach($ppt in $ppts)
+#if($ppt.type == 'id' && $ptt.refType != '')
+    @Column(name = "$textUtils.wordsToSnakeUpper(${ppt.nameColumn})")
+    private String $textUtils.wordsToCamel(${ppt.nameProperty});
+#else
+#if($ppt.type == 'Date')
     @Temporal(TemporalType.DATE)
-    #end
-    @Column(name = "${model.fieldUpperSnake}")
-    private ${model.type} ${model.fieldCamel};
-    #end
+#end
+    @Column(name = "$textUtils.wordsToSnakeUpper(${ppt.nameColumn})")
+    private ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty});
+#end
 #end
 }

@@ -1,4 +1,10 @@
-package ${base.basePackage}.${mdl.name};
+package ${basePackage}.${mdlNameLower}.${ettNameLower}.ctrl;
+
+import java.util.List;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -7,37 +13,99 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ${base.basePackage}.common.util.RequestUtil;
-import ${base.basePackage}.model.dto.SuccessResponse;
-import ${base.basePackage}.dto.${mdl.name}RequestDto;
-import ${base.basePackage}.service.${mdl.name}Service;
+import org.springframework.data.domain.Pageable;
+import ${basePackage}.common.util.SearchUtil;
+import ${basePackage}.model.enumeration.SortOrderEnum;
+import ${basePackage}.common.exception.BaseException;
+import ${basePackage}.common.util.RequestUtil;
+import ${basePackage}.model.dto.SuccessResponse;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Request;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Dto;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.service.${ettNamePpt}Service;
 
-import java.util.List;
+
+/**
+ * Basic ${ettNamePpt} CRUD APIs
+ * @author KhanhTD
+ *
+ */
 
 @RestController
-@RequestMapping("${mdl.requestMapping}")
-@Tag(name = "${mdl.name} Controller")
-public class ${mdl.name}Ctrl {
+@RequestMapping("/${ettRequestMapping}")
+@Tag(name = "${ettNamePpt} Controller")
+public class ${ettNamePpt}Ctrl {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private ${mdl.name}Service ${mdl.name}Service;
-#foreach($api in $apis)
-    #if($api.key == 'ApiCreate')
+    private ${ettNamePpt}Service ${ettNameCamel}Service;
 
-    @${api.getMethod()}Mapping("/create")
-    @ApiOperation("Create ${api.getModule()}")
-    public SuccessResponse<${api.output}> create(@RequestBody ${api.getModule()}Request request) {
-        return RequestUtil.ok(${api.getModule()}Service.create(request));
+    /**
+        * Create ${ettNamePpt} from request body
+        * @param request - object to create
+        * @return new ${ettNamePpt} id if succeed
+    */
+    @PostMapping("/create")
+    @ApiOperation("Create ${ett.nameProperty}")
+    public SuccessResponse<String> create(@Valid @RequestBody ${ettNamePpt}Request request) {
+        return RequestUtil.ok(${ettNameCamel}Service.create(request));
     }
-    #elseif($api.key == 'ApiUpdate')
 
-    @${api.getMethod()}Mapping("/update")
-    @ApiOperation("Update ${api.getModule()}")
-    public SuccessResponse<${api.output}> update(@RequestBody ${api.getModule()}Request request) {
-        return RequestUtil.ok(${api.getModule()}Service.update(request));
+    /**
+        * Update all fields in the request body
+        * @param request - update object
+        * @return
+        * @throws BaseException if ${ettNamePpt}Dto id is not found
+    */
+    @PutMapping("/update")
+    @ApiOperation("Update ${ett.nameProperty}")
+    public SuccessResponse update(@RequestBody ${ettNamePpt}Request request) throws BaseException {
+        ${ettNameCamel}Service.update(request);
+        return new SuccessResponse();
     }
-    #end
-#end
 
+    /**
+        * Find ${ettNamePpt} records by name column and others
+        * @param request - Advanced filter conditions
+        * @param page - Zero-based page number
+        * @param size - Page size
+        * @param sort - Sort column
+        * @param order - Sort direction
+        * @return Paged ${ettNamePpt} list
+    */
+    @PostMapping("/search")
+    @ApiOperation("Search ${ett.nameProperty}")
+    public SuccessResponse<List<${ettNamePpt}Dto>> advancedSearch(
+            @RequestBody ${ettNamePpt}Request request, @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
+            @Positive @RequestParam(required = false) Integer size, @RequestParam(required = false) String sort,
+            @RequestParam(required = false) SortOrderEnum order
+    ) {
+        Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
+        return RequestUtil.ok(${ettNameCamel}Service.advancedSearch(request, pageable));
+    }
+
+    /**
+       * Delete ${ett.nameProperty} by id
+       * @param id of ${ett.nameProperty}
+       * @return
+       * @throws BaseException id is not found
+    */
+    @DeleteMapping("/{id}")
+    @ApiOperation("Delete ${ett.nameProperty}")
+    public SuccessResponse delete(@PathVariable String id) throws BaseException {
+        ${ettNameCamel}Service.delete(id);
+        return new SuccessResponse();
+    }
+
+    /**
+       * Approve ${ett.nameProperty} by id
+       * @param id of ${ett.nameProperty}
+       * @return
+       * @throws BaseException id is not found
+    */
+    @PutMapping("/approve/{id}")
+    @ApiOperation("Approve ${ett.nameProperty}")
+    public SuccessResponse approve(@PathVariable String id) throws BaseException {
+        ${ettNameCamel}Service.approve(id);
+        return new SuccessResponse();
+    }
 }
