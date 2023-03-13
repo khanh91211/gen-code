@@ -304,7 +304,7 @@ public class GenCodeApplication {
     private static void exportFile(String moduleName,String packageName, String packageClassName, String fileName, String contentFile) throws IOException {
         //tao package neu chưa có
         String desktopPath = FileSystemView.getFileSystemView().getHomeDirectory() + "/Desktop/";
-        String packagePath = desktopPath + basePackage.replace(".", "/") + "/" + moduleName + "/" + packageName+"/"+packageClassName;
+        String packagePath = desktopPath + moduleName + basePackage.replace(".", "/") + "/" + moduleName + "/" + packageName+"/"+packageClassName;
         File packageDir = new File(packagePath);
         if (packageDir.exists()) {
             System.out.println("Package directory already exists: " + packagePath);
