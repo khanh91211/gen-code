@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import com.googlecode.jmapper.JMapper;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -35,6 +36,8 @@ import ${basePackage}.${mdlNameLower}.${ettNameLower}.service.${ettNamePpt}Servi
 @Tag(name = "${ettNamePpt} Controller")
 public class ${ettNamePpt}Ctrl {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private JMapper<${ettNamePpt}Dto, ${ettNamePpt}> jmapper = new JMapper<>(${ettNamePpt}Dto.class, ${ettNamePpt}.class);
 
     @Autowired
     private ${ettNamePpt}Service ${ettNameCamel}Service;
@@ -74,13 +77,14 @@ public class ${ettNamePpt}Ctrl {
     */
     @PostMapping("/search")
     @ApiOperation("Search ${ett.nameProperty}")
-    public SuccessResponse<List<${ettNamePpt}Dto>> advancedSearch(
+    public PageResponse<CategoryDto,Category> advancedSearch(
             @RequestBody ${ettNamePpt}Request request, @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
             @Positive @RequestParam(required = false) Integer size, @RequestParam(required = false) String sort,
             @RequestParam(required = false) SortOrderEnum order
     ) {
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
-        return RequestUtil.ok(${ettNameCamel}Service.advancedSearch(request, pageable));
+        Page<Category> pageData = ${ettNameCamel}Service.advancedSearch(request, pageable);
+        return new PageResponse<>(pageData, jmapper);
     }
 
     /**
@@ -108,4 +112,36 @@ public class ${ettNamePpt}Ctrl {
         ${ettNameCamel}Service.approve(id);
         return new SuccessResponse();
     }
+
+#foreach($ppt in $ppts)
+#set($namePptCamel = $textUtils.wordsToCamel(${ppt.nameProperty}))
+#set($ref = $ppt.refType)
+#set($canFilterBy = $ppt.canFilterBy)
+#if($ref.isBlank() && $canFilterBy.isBlank())
+#elseif($ref.isBlank() && $canFilterBy == 'TRUE')
+    /**
+       * Find by ${ppt.entityKey} ${ppt.nameProperty}
+       * @param $textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) of ${ppt.entityKey}
+       * @return
+       * @throws BaseException $textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) is not found
+    */
+    @GetMapping()
+    @ApiOperation("Get ${ppt.entityKey} by ${ppt.nameProperty}")
+    public SuccessResponse<List<${ppt.entityKey}Dto>> find${ppt.entityKey}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(@RequestParam ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
+        return RequestUtil.ok($textUtils.wordsToCamel(${ppt.entityKey}).concat("Service.find").concat(${ppt.refType}).concat("By").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat(");")
+    }
+#elseif($ref != ${ppt.entityKey} && $canFilterBy == 'TRUE')
+    /**
+       * Find ${ppt.refType} by ${ppt.entityKey} ${ppt.nameProperty}
+       * @param ${ppt.nameProperty} of ${ppt.entityKey}
+       * @return
+       * @throws BaseException ${ppt.nameProperty} is not found
+    */
+    @GetMapping("/{$textUtils.wordsToCamel(${ppt.nameProperty})}/$textUtils.wordsToKebabLower(${ppt.refType})")
+    @ApiOperation("Get ${ppt.refType} by ${ppt.entityKey} ${ppt.nameProperty}")
+    public SuccessResponse<List<${ppt.refType}Dto>> find${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(@PathVariable ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
+        return RequestUtil.ok($textUtils.wordsToCamel(${ppt.entityKey}).concat("Service.find").concat(${ppt.refType}).concat("By").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat(");")
+    }
+#end
+#end
 }

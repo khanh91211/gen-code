@@ -2,6 +2,7 @@ package ${basePackage}.${mdlNameLower}.${ettNameLower}.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import ${basePackage}.common.constants.ValidationType;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -12,8 +13,11 @@ import java.util.Date;
 @Getter
 @Setter
 public class ${ettNamePpt}Request {
+#if(${ett.genService} == 'TRUE' && ${ett.genCtrl} == 'TRUE')
+    private String id;
+#end
 #foreach($ppt in $ppts)
-#if($ppt.min != '' && $ppt.max != '')
+#if($ppt.min != '' && $ppt.min != ' ' && $ppt.max != '' && $ppt.max != ' ')
     @Size(min = ${ppt.min}, max = ${ppt.max})
 #elseif($ppt.min != '')
     @Size(min = ${ppt.min})
@@ -26,7 +30,7 @@ public class ${ettNamePpt}Request {
 #if($ppt.pattern != '')
 #foreach($vl in $vld)
 #if($vl.nameEn == ${ppt.pattern})
-    @Pattern(regexp = "$vl.value", message = "")
+    @Pattern(regexp = ValidationType.$textUtils.wordsToUpperCase(${vl.nameEn}), message = "")
 #end
 #end
 #end

@@ -53,6 +53,10 @@ public class TextUtils {
   public static String wordsToKebabLower(String words) {
     return words.replace(" ", "-").toLowerCase();
   }
+
+  public static String wordsToUpperCase(String words) {
+    return adjOutput(words.replace(" ", "").toUpperCase());
+  }
   
   public static String getPlural(String words) {
     String ret = "";

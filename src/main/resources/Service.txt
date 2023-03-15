@@ -1,9 +1,11 @@
 package ${basePackage}.${mdlNameLower}.${ettNameLower}.service;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import ${basePackage}.common.exception.BaseException;
 import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Dto;
 import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Request;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.entity.${ettNamePpt};
 
 import java.util.List;
 
@@ -12,9 +14,23 @@ public interface ${ettNamePpt}Service {
 
     void update(${ettNamePpt}Request request) throws BaseException;
 
-    List<${ettNamePpt}Dto> advancedSearch(${ettNamePpt}Request request, Pageable pageable);
+    Page<${ettNamePpt}Dto> advancedSearch(${ettNamePpt}Request request, Pageable pageable);
 
     void delete(String id) throws BaseException;
 
     void approve(String id) throws BaseException;
+
+#foreach($ppt in $ppts)
+#set($namePptCamel = $textUtils.wordsToCamel(${ppt.nameProperty}))
+#set($ref = $ppt.refType)
+#set($canFilterBy = $ppt.canFilterBy)
+#if($ref.isBlank() && $canFilterBy.isBlank())
+#elseif($ref.isBlank() && $canFilterBy == 'TRUE')
+    List<${ppt.entityKey}Dto> find${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException;
+
+#elseif($ref != ${ppt.entityKey} && $canFilterBy == 'TRUE')
+    List<${ppt.refType}Dto> find${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException;
+
+#end
+#end
 }
