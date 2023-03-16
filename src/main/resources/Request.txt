@@ -35,10 +35,16 @@ public class ${ettNamePpt}Request {
 #end
 #end
 #if($ppt.type == 'id' && $ptt.refType != '')
-    @ApiModelProperty(value = "${ppt.nameDisplay}", example = "")
-    private String $textUtils.wordsToCamel(${ppt.nameProperty});
+#if($ppt.nameDisplay.isBlank())
 #else
     @ApiModelProperty(value = "${ppt.nameDisplay}", example = "")
+#end
+    private String $textUtils.wordsToCamel(${ppt.nameProperty});
+#else
+#if($ppt.nameDisplay.isBlank())
+#else
+    @ApiModelProperty(value = "${ppt.nameDisplay}", example = "")
+#end
     private ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty});
 #end
 #end
