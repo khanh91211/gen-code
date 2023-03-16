@@ -14,16 +14,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ${basePackage}.common.util.SearchUtil;
 import ${basePackage}.model.enumeration.SortOrderEnum;
 import ${basePackage}.common.exception.BaseException;
 import ${basePackage}.common.util.RequestUtil;
 import ${basePackage}.model.dto.SuccessResponse;
+import ${basePackage}.model.dto.PageResponse;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.entity.${ettNamePpt};
 import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Request;
 import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Dto;
 import ${basePackage}.${mdlNameLower}.${ettNameLower}.service.${ettNamePpt}Service;
-
+#set($uniqueEttRef = [])
+#foreach($ppt in $ppts)
+#set($ref = $ppt.refType)
+#if($ref.isBlank() && $ref == ${ppt.entityKey} && $uniqueEttRef.contains( $ppt.refType ) )
+#elseif($ref == ${ett.nameProperty} )
+#else
+#set($addUniqueEttRef = $uniqueEttRef.add($ref))
+#end
+#end
+#foreach($ettRef in $uniqueEttRef)
+#if($ettRef.isBlank())
+#else
+import ${basePackage}.${mdlNameLower}.$textUtils.wordsToLowerCase(${ettRef.toString()}).concat(".dto.").concat($textUtils.wordsToCamelFirstUpper(${ettRef.toString()})).concat("Dto;")
+#end
+#end
 
 /**
  * Basic ${ettNamePpt} CRUD APIs
@@ -77,13 +94,13 @@ public class ${ettNamePpt}Ctrl {
     */
     @PostMapping("/search")
     @ApiOperation("Search ${ett.nameProperty}")
-    public PageResponse<CategoryDto,Category> advancedSearch(
+    public PageResponse<${ettNamePpt}Dto,${ettNamePpt}> advancedSearch(
             @RequestBody ${ettNamePpt}Request request, @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
             @Positive @RequestParam(required = false) Integer size, @RequestParam(required = false) String sort,
             @RequestParam(required = false) SortOrderEnum order
     ) {
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
-        Page<Category> pageData = ${ettNameCamel}Service.advancedSearch(request, pageable);
+        Page<${ettNamePpt}> pageData = ${ettNameCamel}Service.advancedSearch(request, pageable);
         return new PageResponse<>(pageData, jmapper);
     }
 
@@ -121,26 +138,26 @@ public class ${ettNamePpt}Ctrl {
 #elseif($ref.isBlank() && $canFilterBy == 'TRUE')
     /**
        * Find by ${ppt.entityKey} ${ppt.nameProperty}
-       * @param $textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) of ${ppt.entityKey}
+       * @param $textUtils.wordsToCamel(${ppt.nameProperty}) of ${ppt.entityKey}
        * @return
        * @throws BaseException $textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) is not found
     */
     @GetMapping()
     @ApiOperation("Get ${ppt.entityKey} by ${ppt.nameProperty}")
-    public SuccessResponse<List<${ppt.entityKey}Dto>> find${ppt.entityKey}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(@RequestParam ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
-        return RequestUtil.ok($textUtils.wordsToCamel(${ppt.entityKey}).concat("Service.find").concat(${ppt.refType}).concat("By").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat(");")
+    public SuccessResponse<List<${ppt.entityKey}Dto>> findBy$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(@RequestParam ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
+        return RequestUtil.ok($textUtils.wordsToCamel(${ppt.entityKey}).concat("Service.find").concat(${ppt.refType}).concat("By").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat("));")
     }
 #elseif($ref != ${ppt.entityKey} && $canFilterBy == 'TRUE')
     /**
        * Find ${ppt.refType} by ${ppt.entityKey} ${ppt.nameProperty}
-       * @param ${ppt.nameProperty} of ${ppt.entityKey}
+       * @param $textUtils.wordsToCamel(${ppt.nameProperty}) of ${ppt.entityKey}
        * @return
        * @throws BaseException ${ppt.nameProperty} is not found
     */
     @GetMapping("/{$textUtils.wordsToCamel(${ppt.nameProperty})}/$textUtils.wordsToKebabLower(${ppt.refType})")
     @ApiOperation("Get ${ppt.refType} by ${ppt.entityKey} ${ppt.nameProperty}")
     public SuccessResponse<List<${ppt.refType}Dto>> find${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(@PathVariable ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
-        return RequestUtil.ok($textUtils.wordsToCamel(${ppt.entityKey}).concat("Service.find").concat(${ppt.refType}).concat("By").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat(");")
+        return RequestUtil.ok($textUtils.wordsToCamel(${ppt.entityKey}).concat("Service.find").concat(${ppt.refType}).concat("By").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat("));")
     }
 #end
 #end

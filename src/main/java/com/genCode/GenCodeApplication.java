@@ -248,6 +248,7 @@ public class GenCodeApplication {
                     context.put("ett", ett);
                     List<PropertiesDto> listProEntityModule = propertiesDtos.stream().filter(c -> c.getModule().equals(mdl.getNameEn()) && c.getEntityKey().equals(ett.getEntityKey())).collect(Collectors.toList());
                     context.put("ppts", listProEntityModule);
+                    context.put("pptAll",propertiesDtos);
                     context.put("vld", validationDtos);
                     context.put("textUtils", new TextUtils());
 

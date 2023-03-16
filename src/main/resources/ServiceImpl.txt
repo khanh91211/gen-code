@@ -19,10 +19,9 @@ import ${basePackage}.${mdlNameLower}.${ettNameLower}.entity.${ettNamePpt};
 import ${basePackage}.${mdlNameLower}.${ettNameLower}.repo.${ettNamePpt}Repo;
 #set($uniqueEttRef = [])
 #foreach($ppt in $ppts)
-#set($namePptCamel = $textUtils.wordsToCamel(${ppt.nameProperty}))
 #set($ref = $ppt.refType)
-#set($canFilterBy = $ppt.canFilterBy)
-#if($ref == ${ppt.entityKey} && $uniqueEttRef.contains( $ppt.refType ) )
+#if($ref.isBlank() && $ref == ${ppt.entityKey} && $uniqueEttRef.contains( $ppt.refType ) )
+#elseif($ref == ${ett.nameProperty} )
 #else
 #set($addUniqueEttRef = $uniqueEttRef.add($ref))
 #end
@@ -38,10 +37,8 @@ import ${basePackage}.${mdlNameLower}.$textUtils.wordsToLowerCase(${ettRef.toStr
 import javax.persistence.EntityManager;
 import javax.sql.DataSource;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -50,14 +47,24 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
     private final Logger log = LoggerFactory.getLogger(${ettNamePpt}ServiceImpl.class);
 
     private ${ettNamePpt}Repo ${ettNameCamel}Repo;
+#set($repoEx = "")
+#set($repoExtend = "")
 #foreach($ettRef in $uniqueEttRef)
 #if($ettRef.isBlank())
 #else
     private ${ettRef.toString()}Repo $textUtils.wordsToCamel(${ettRef.toString()})Repo;
+#if($repoEx.isBlank())
+#set($repoExtend = $repoEx.concat(${ettRef.toString()}).concat("Repo ").concat($textUtils.wordsToCamel(${ettRef.toString()})).concat("Repo"))
+#else
+#set($repoExtend = $repoEx.concat(",").concat(${ettRef.toString()}).concat("Repo ").concat($textUtils.wordsToCamel(${ettRef.toString()})).concat("Repo"))
 #end
 #end
-
+#end
+#if( $repoExtend.isBlank())
     public ${ettNamePpt}ServiceImpl(DataSource dataSource, EntityManager entityManager, ${ettNamePpt}Repo ${ettNameCamel}Repo) {
+#else
+    public ${ettNamePpt}ServiceImpl(DataSource dataSource, EntityManager entityManager, ${ettNamePpt}Repo ${ettNameCamel}Repo, $repoExtend) {
+#end
         super(dataSource, entityManager, ${ettNamePpt}.class);
         this.${ettNameCamel}Repo = ${ettNameCamel}Repo;
 #foreach($ettRef in $uniqueEttRef)
@@ -148,21 +155,22 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
 #if($ref.isBlank() && $canFilterBy.isBlank())
 #elseif($ref.isBlank() && $canFilterBy == 'TRUE')
     @Override
-    public List<${ppt.entityKey}Dto> find${ppt.entityKey}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws Exception {
+    public List<${ppt.entityKey}Dto> findBy$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
         log.debug("Request to find${ppt.entityKey}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) : {}", $textUtils.wordsToCamel(${ppt.nameProperty}));
 #if(${ppt.type} != 'String')
         if ($textUtils.wordsToCamel(${ppt.nameProperty}) != null) {
+            throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, String.valueOf($textUtils.wordsToCamel(${ppt.nameProperty})), null);
 #else
         if (CommonUtil.isNullOrEmpty($textUtils.wordsToCamel(${ppt.nameProperty}))) {
-#end
             throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, $textUtils.wordsToCamel(${ppt.nameProperty}), null);
+#end
         }
         return $textUtils.wordsToCamel(${ppt.entityKey}).concat("Repo.find").concat(${ppt.refType}).concat("By").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat(");")
     }
 
 #elseif($ref != ${ppt.entityKey} && $canFilterBy == 'TRUE')
     @Override
-    public List<${ppt.refType}Dto> find${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws Exception {
+    public List<${ppt.refType}Dto> find${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
         log.debug("Request to find${ppt.entityKey}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) : {}", $textUtils.wordsToCamel(${ppt.nameProperty}));
 #if(${ppt.type} != 'String')
         if ($textUtils.wordsToCamel(${ppt.nameProperty}) != null) {
