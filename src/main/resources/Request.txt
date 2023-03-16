@@ -3,6 +3,7 @@ package ${basePackage}.${mdlNameLower}.${ettNameLower}.dto;
 import lombok.Getter;
 import lombok.Setter;
 import ${basePackage}.common.constants.ValidationType;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -34,8 +35,10 @@ public class ${ettNamePpt}Request {
 #end
 #end
 #if($ppt.type == 'id' && $ptt.refType != '')
+    @ApiModelProperty(value = "${ppt.nameDisplay}", example = "")
     private String $textUtils.wordsToCamel(${ppt.nameProperty});
 #else
+    @ApiModelProperty(value = "${ppt.nameDisplay}", example = "")
     private ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty});
 #end
 #end
