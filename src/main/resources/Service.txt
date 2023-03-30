@@ -26,15 +26,15 @@ import ${basePackage}.${mdlNameLower}.$textUtils.wordsToLowerCase(${ettRef.toStr
 import java.util.List;
 
 public interface ${ettNamePpt}Service {
-    String create(${ettNamePpt}Request request);
+    String taoMoi(${ettNamePpt}Request request);
 
-    void update(${ettNamePpt}Request request) throws BaseException;
+    void capNhat(${ettNamePpt}Request request) throws BaseException;
 
-    Page<${ettNamePpt}> advancedSearch(${ettNamePpt}Request request, Pageable pageable);
+    Page<${ettNamePpt}> timKiemNangCao(${ettNamePpt}Request request, Pageable pageable);
 
-    void delete(String id) throws BaseException;
+    void xoa(String id) throws BaseException;
 
-    void approve(String id) throws BaseException;
+    void duyet(String id) throws BaseException;
 
 #foreach($ppt in $ppts)
 #set($namePptCamel = $textUtils.wordsToCamel(${ppt.nameProperty}))
@@ -42,10 +42,10 @@ public interface ${ettNamePpt}Service {
 #set($canFilterBy = $ppt.canFilterBy)
 #if($ref.isBlank() && $canFilterBy.isBlank())
 #elseif($ref.isBlank() && $canFilterBy == 'TRUE')
-    List<${ppt.entityKey}Dto> findBy$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException;
+    List<${ppt.entityKey}Dto> timTheo$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException;
 
 #elseif($ref != ${ppt.entityKey} && $canFilterBy == 'TRUE')
-    List<${ppt.refType}Dto> find${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException;
+    List<${ppt.refType}Dto> tim${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException;
 
 #end
 #end

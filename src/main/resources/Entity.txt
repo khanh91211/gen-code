@@ -5,7 +5,12 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+#foreach($ppt in $ppts)
+#if($ppt.type == 'Date')
 import java.util.Date;
+#break
+#end
+#end
 
 import ${basePackage}.model.common.EntityBase;
 

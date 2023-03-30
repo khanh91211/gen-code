@@ -15,7 +15,7 @@ import java.util.List;
 public interface ${ettNamePpt}Repo extends JpaRepository<${ettNamePpt}, String> , JpaSpecificationExecutor<${ettNamePpt}>{
     @Modifying
     @Query("Update ${ettNamePpt} ett set ett.status = :status where ett.id = :id")
-    void approve(@Param("status") String status, @Param("id") String id);
+    void duyet(@Param("status") String status, @Param("id") String id);
 
 #foreach($ppt in $ppts)
 #set($ref = $ppt.refType)

@@ -5,10 +5,30 @@ import lombok.Setter;
 import ${basePackage}.common.constants.ValidationType;
 import io.swagger.annotations.ApiModelProperty;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.constraints.Pattern;
+#foreach($ppt in $ppts)
+#if($ppt.type == 'Date')
 import java.util.Date;
+#break
+#end
+#end
+#foreach($ppt in $ppts)
+#if($ppt.min != '' || $ppt.max != '')
+import javax.validation.constraints.Size;
+#break
+#end
+#end
+#foreach($ppt in $ppts)
+#if($ppt.required == 'TRUE')
+import javax.validation.constraints.NotNull;
+#break
+#end
+#end
+#foreach($ppt in $ppts)
+#if($ppt.pattern != '')
+import javax.validation.constraints.Pattern;
+#break
+#end
+#end
 
 @Getter
 @Setter
@@ -48,5 +68,4 @@ public class ${ettNamePpt}Request {
     private ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty});
 #end
 #end
-
 }

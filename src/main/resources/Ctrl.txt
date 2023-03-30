@@ -52,81 +52,79 @@ import ${basePackage}.${mdlNameLower}.$textUtils.wordsToLowerCase(${ettRef.toStr
 @RequestMapping("/${ettRequestMapping}")
 @Tag(name = "${ettNamePpt} Controller")
 public class ${ettNamePpt}Ctrl {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
     private JMapper<${ettNamePpt}Dto, ${ettNamePpt}> jmapper = new JMapper<>(${ettNamePpt}Dto.class, ${ettNamePpt}.class);
 
     @Autowired
     private ${ettNamePpt}Service ${ettNameCamel}Service;
 
     /**
-        * Create ${ettNamePpt} from request body
-        * @param request - object to create
-        * @return new ${ettNamePpt} id if succeed
+        * Tao moi ${ettNamePpt} tu du lieu dau vao
+        * @param request - doi tuong tao moi
+        * @return ${ettNamePpt} id neu thanh cong
     */
-    @PostMapping("/create")
-    @ApiOperation("Create ${ett.nameProperty}")
-    public SuccessResponse<String> create(@Valid @RequestBody ${ettNamePpt}Request request) {
-        return RequestUtil.ok(${ettNameCamel}Service.create(request));
+    @PostMapping("/tao-moi")
+    @ApiOperation("Tao moi ${ett.nameProperty}")
+    public SuccessResponse<String> taoMoi(@Valid @RequestBody ${ettNamePpt}Request request) {
+        return RequestUtil.ok(${ettNameCamel}Service.taoMoi(request));
     }
 
     /**
-        * Update all fields in the request body
-        * @param request - update object
+        * Cap nhat thong tin tu du lieu dau vao
+        * @param request - doi tuong cap nhat
         * @return
-        * @throws BaseException if ${ettNamePpt}Dto id is not found
+        * @throws BaseException neu khong tim thay ${ettNamePpt}Dto id
     */
-    @PutMapping("/update")
-    @ApiOperation("Update ${ett.nameProperty}")
-    public SuccessResponse update(@RequestBody ${ettNamePpt}Request request) throws BaseException {
-        ${ettNameCamel}Service.update(request);
+    @PutMapping("/cap-nhat")
+    @ApiOperation("Cap nhat ${ett.nameProperty}")
+    public SuccessResponse capNhat(@RequestBody ${ettNamePpt}Request request) throws BaseException {
+        ${ettNameCamel}Service.capNhat(request);
         return new SuccessResponse();
     }
 
     /**
-        * Find ${ettNamePpt} records by name column and others
-        * @param request - Advanced filter conditions
-        * @param page - Zero-based page number
-        * @param size - Page size
-        * @param sort - Sort column
-        * @param order - Sort direction
-        * @return Paged ${ettNamePpt} list
+        * Tim ban ghi ${ettNamePpt} theo ten cot hoac tieu chi khac
+        * @param request - dieu kien tim kiem nang cao
+        * @param page - so trang
+        * @param size - kich thuoc mot trang
+        * @param sort - sap xep theo cot
+        * @param order - sap xep
+        * @return Paged ${ettNamePpt}
     */
-    @PostMapping("/search")
-    @ApiOperation("Search ${ett.nameProperty}")
-    public PageResponse<${ettNamePpt}Dto,${ettNamePpt}> advancedSearch(
+    @PostMapping("/tim-kiem")
+    @ApiOperation("Tim kiem ${ett.nameProperty}")
+    public PageResponse<${ettNamePpt}Dto,${ettNamePpt}> timKiemNangCao(
             @RequestBody ${ettNamePpt}Request request, @PositiveOrZero @RequestParam(required = false, defaultValue = "0") Integer page,
             @Positive @RequestParam(required = false) Integer size, @RequestParam(required = false) String sort,
             @RequestParam(required = false) SortOrderEnum order
     ) {
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
-        Page<${ettNamePpt}> pageData = ${ettNameCamel}Service.advancedSearch(request, pageable);
+        Page<${ettNamePpt}> pageData = ${ettNameCamel}Service.timKiemNangCao(request, pageable);
         return new PageResponse<>(pageData, jmapper);
     }
 
     /**
-       * Delete ${ett.nameProperty} by id
-       * @param id of ${ett.nameProperty}
+       * Xoa ${ett.nameProperty} theo id
+       * @param id cua ${ett.nameProperty}
        * @return
-       * @throws BaseException id is not found
+       * @throws BaseException neu id de trong
     */
     @DeleteMapping("/{id}")
-    @ApiOperation("Delete ${ett.nameProperty}")
-    public SuccessResponse delete(@PathVariable String id) throws BaseException {
-        ${ettNameCamel}Service.delete(id);
+    @ApiOperation("Xoa ${ett.nameProperty}")
+    public SuccessResponse xoa(@PathVariable String id) throws BaseException {
+        ${ettNameCamel}Service.xoa(id);
         return new SuccessResponse();
     }
 
     /**
-       * Approve ${ett.nameProperty} by id
-       * @param id of ${ett.nameProperty}
+       * Duyet ${ett.nameProperty} theo id
+       * @param id cua ${ett.nameProperty}
        * @return
-       * @throws BaseException id is not found
+       * @throws BaseException neu id de trong
     */
-    @PutMapping("/approve/{id}")
-    @ApiOperation("Approve ${ett.nameProperty}")
-    public SuccessResponse approve(@PathVariable String id) throws BaseException {
-        ${ettNameCamel}Service.approve(id);
+    @PutMapping("/duyet/{id}")
+    @ApiOperation("Duyet ${ett.nameProperty}")
+    public SuccessResponse duyet(@PathVariable String id) throws BaseException {
+        ${ettNameCamel}Service.duyet(id);
         return new SuccessResponse();
     }
 
@@ -137,27 +135,27 @@ public class ${ettNamePpt}Ctrl {
 #if($ref.isBlank() && $canFilterBy.isBlank())
 #elseif($ref.isBlank() && $canFilterBy == 'TRUE')
     /**
-       * Find by ${ppt.entityKey} ${ppt.nameProperty}
-       * @param $textUtils.wordsToCamel(${ppt.nameProperty}) of ${ppt.entityKey}
+       * Tim theo ${ppt.entityKey} ${ppt.nameProperty}
+       * @param $textUtils.wordsToCamel(${ppt.nameProperty}) cua ${ppt.entityKey}
        * @return
-       * @throws BaseException $textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) is not found
+       * @throws BaseException neu $textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) de trong
     */
     @GetMapping()
-    @ApiOperation("Get ${ppt.entityKey} by ${ppt.nameProperty}")
-    public SuccessResponse<List<${ppt.entityKey}Dto>> findBy$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(@RequestParam ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
-        return RequestUtil.ok($textUtils.wordsToCamel(${ppt.entityKey}).concat("Service.find").concat(${ppt.refType}).concat("By").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat("));")
+    @ApiOperation("Lay ${ppt.entityKey} theo ${ppt.nameProperty}")
+    public SuccessResponse<List<${ppt.entityKey}Dto>> timTheo$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(@RequestParam ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
+        return RequestUtil.ok($textUtils.wordsToCamel(${ppt.entityKey}).concat("Service.timTheo").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat("));")
     }
 #elseif($ref != ${ppt.entityKey} && $canFilterBy == 'TRUE')
     /**
-       * Find ${ppt.refType} by ${ppt.entityKey} ${ppt.nameProperty}
-       * @param $textUtils.wordsToCamel(${ppt.nameProperty}) of ${ppt.entityKey}
+       * Tim ${ppt.refType} theo ${ppt.entityKey} ${ppt.nameProperty}
+       * @param $textUtils.wordsToCamel(${ppt.nameProperty}) cua ${ppt.entityKey}
        * @return
-       * @throws BaseException ${ppt.nameProperty} is not found
+       * @throws BaseException neu ${ppt.nameProperty} de trong
     */
     @GetMapping("/{$textUtils.wordsToCamel(${ppt.nameProperty})}/$textUtils.wordsToKebabLower(${ppt.refType})")
-    @ApiOperation("Get ${ppt.refType} by ${ppt.entityKey} ${ppt.nameProperty}")
-    public SuccessResponse<List<${ppt.refType}Dto>> find${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(@PathVariable ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
-        return RequestUtil.ok($textUtils.wordsToCamel(${ppt.entityKey}).concat("Service.find").concat(${ppt.refType}).concat("By").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat("));")
+    @ApiOperation("Lay ${ppt.refType} theo ${ppt.entityKey} ${ppt.nameProperty}")
+    public SuccessResponse<List<${ppt.refType}Dto>> tim${ppt.refType}Theo$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(@PathVariable ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
+        return RequestUtil.ok($textUtils.wordsToCamel(${ppt.entityKey}).concat("Service.tim").concat(${ppt.refType}).concat("Theo").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat("));")
     }
 #end
 #end

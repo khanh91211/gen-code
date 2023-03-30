@@ -76,8 +76,8 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
     }
 
     @Override
-    public String create(${ettNamePpt}Request request) {
-        log.debug("Request to save ${ettNamePpt} : {}", request);
+    public String taoMoi(${ettNamePpt}Request request) {
+        log.debug("Yeu cau taoMoi ${ettNamePpt} : {}", request);
         ${ettNamePpt} ett = new ${ettNamePpt}();
         BeanUtils.copyProperties(request, ett);
         ett.setId(UUID.randomUUID().toString());
@@ -86,8 +86,8 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
     }
 
     @Override
-    public void update(${ettNamePpt}Request request) throws BaseException {
-        log.debug("Request to update ${ettNamePpt} : {}", request);
+    public void capNhat(${ettNamePpt}Request request) throws BaseException {
+        log.debug("Yeu cau capNhat ${ettNamePpt} : {}", request);
         if (CommonUtil.isNullOrEmpty(request.getId())) {
             throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, request.getId(), null);
         }
@@ -97,8 +97,8 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
     }
 
     @Override
-    public Page<${ettNamePpt}> advancedSearch(${ettNamePpt}Request request, Pageable pageable) {
-        log.debug("Request to search ${ettNamePpt} : {}", request);
+    public Page<${ettNamePpt}> timKiemNangCao(${ettNamePpt}Request request, Pageable pageable) {
+        log.debug("Yeu cau timKiemNangCao ${ettNamePpt} : {}", request);
         List<Specification<${ettNamePpt}>> list = getAdvanceSearchSpecList(request);
         if(!CommonUtil.listIsEmptyOrNull(list)){
             Specification<${ettNamePpt}> spec = list.get(0);
@@ -125,14 +125,16 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
              spec.add(SearchUtil.eq("$textUtils.wordsToCamel(${ppt.nameProperty})", request.get$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})()));
         }
 #end
+#else
+
 #end
 #end
         return spec;
     }
 
     @Override
-    public void delete(String id) throws BaseException {
-        log.debug("Request to delete ${ettNamePpt} : {}", id);
+    public void xoa(String id) throws BaseException {
+        log.debug("Yeu cau xoa ${ettNamePpt} : {}", id);
         if (CommonUtil.isNullOrEmpty(id)) {
             throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, id, null);
         }
@@ -140,8 +142,8 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
     }
 
     @Override
-    public void approve(String id) throws BaseException {
-        log.debug("Request to approve ${ettNamePpt} : {}", id);
+    public void duyet(String id) throws BaseException {
+        log.debug("Yeu cau duyet ${ettNamePpt} : {}", id);
         if (CommonUtil.isNullOrEmpty(id)) {
             throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, id, null);
         }
@@ -155,8 +157,8 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
 #if($ref.isBlank() && $canFilterBy.isBlank())
 #elseif($ref.isBlank() && $canFilterBy == 'TRUE')
     @Override
-    public List<${ppt.entityKey}Dto> findBy$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
-        log.debug("Request to find${ppt.entityKey}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) : {}", $textUtils.wordsToCamel(${ppt.nameProperty}));
+    public List<${ppt.entityKey}Dto> timTheo$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
+        log.debug("Yeu cau timTheo$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) : {}", $textUtils.wordsToCamel(${ppt.nameProperty}));
 #if(${ppt.type} != 'String')
         if ($textUtils.wordsToCamel(${ppt.nameProperty}) != null) {
             throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, String.valueOf($textUtils.wordsToCamel(${ppt.nameProperty})), null);
@@ -165,13 +167,13 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
             throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, $textUtils.wordsToCamel(${ppt.nameProperty}), null);
 #end
         }
-        return $textUtils.wordsToCamel(${ppt.entityKey}).concat("Repo.find").concat(${ppt.refType}).concat("By").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat(");")
+        return $textUtils.wordsToCamel(${ppt.entityKey}).concat("Repo.findBy").concat($textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})).concat("(").concat($namePptCamel).concat(");")
     }
 
 #elseif($ref != ${ppt.entityKey} && $canFilterBy == 'TRUE')
     @Override
-    public List<${ppt.refType}Dto> find${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
-        log.debug("Request to find${ppt.entityKey}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) : {}", $textUtils.wordsToCamel(${ppt.nameProperty}));
+    public List<${ppt.refType}Dto> tim${ppt.refType}Theo$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException {
+        log.debug("Yeu cau tim ${ppt.entityKey} theo $textUtils.wordsToCamelFirstUpper(${ppt.nameProperty}) : {}", $textUtils.wordsToCamel(${ppt.nameProperty}));
 #if(${ppt.type} != 'String')
         if ($textUtils.wordsToCamel(${ppt.nameProperty}) != null) {
 #else
