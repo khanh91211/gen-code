@@ -125,8 +125,6 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
              spec.add(SearchUtil.eq("$textUtils.wordsToCamel(${ppt.nameProperty})", request.get$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})()));
         }
 #end
-#else
-
 #end
 #end
         return spec;
