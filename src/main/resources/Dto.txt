@@ -6,7 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+#foreach($ppt in $ppts)
+#if($ppt.type == 'Date')
 import java.util.Date;
+#break
+#end
+#end
 
 @Getter
 @Setter
