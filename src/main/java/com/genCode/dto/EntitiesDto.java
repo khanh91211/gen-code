@@ -3,15 +3,15 @@ package com.genCode.dto;
 public class EntitiesDto {
     private String isActive;
     private String entityKey;
-    private String module;
-    private String nameProperty;
-    private String nameColumn;
+    private String packageKey;
+    private String typeKey;
+    private String lineKey;
     private String nameDisplay;
-    private String tableName;
     private String genCtrl;
     private String genEntity;
     private String genService;
     private String genRepo;
+    private String excelName;
 
     //get set
 
@@ -23,6 +23,14 @@ public class EntitiesDto {
         this.isActive = isActive;
     }
 
+    public String getPackageKey() {
+        return packageKey;
+    }
+
+    public void setPackageKey(String packageKey) {
+        this.packageKey = packageKey;
+    }
+
     public String getEntityKey() {
         return entityKey;
     }
@@ -31,28 +39,20 @@ public class EntitiesDto {
         this.entityKey = entityKey;
     }
 
-    public String getModule() {
-        return module;
+    public String getTypeKey() {
+        return typeKey;
     }
 
-    public void setModule(String module) {
-        this.module = module;
+    public void setTypeKey(String typeKey) {
+        this.typeKey = typeKey;
     }
 
-    public String getNameProperty() {
-        return nameProperty;
+    public String getLineKey() {
+        return lineKey;
     }
 
-    public void setNameProperty(String nameProperty) {
-        this.nameProperty = nameProperty;
-    }
-
-    public String getNameColumn() {
-        return nameColumn;
-    }
-
-    public void setNameColumn(String nameColumn) {
-        this.nameColumn = nameColumn;
+    public void setLineKey(String lineKey) {
+        this.lineKey = lineKey;
     }
 
     public String getNameDisplay() {
@@ -61,14 +61,6 @@ public class EntitiesDto {
 
     public void setNameDisplay(String nameDisplay) {
         this.nameDisplay = nameDisplay;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
     }
 
     public String getGenCtrl() {
@@ -101,5 +93,13 @@ public class EntitiesDto {
 
     public void setGenRepo(String genRepo) {
         this.genRepo = genRepo;
+    }
+
+    public String getExcelName() {
+        return excelName;
+    }
+
+    public void setExcelName(String excelName) {
+        this.excelName = excelName;
     }
 }

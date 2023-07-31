@@ -1,11 +1,11 @@
-package ${basePackage}.${mdlNameLower}.${ettNameLower}.service;
+package ${basePackage}.${ettNameLower}.service;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
-import ${basePackage}.common.exception.BaseException;
-import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Dto;
-import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Request;
-import ${basePackage}.${mdlNameLower}.${ettNameLower}.entity.${ettNamePpt};
+import ${basePackageImport}.model.dto.exception.BusinessException;
+import ${basePackageImport}.model.entity.${ettNameLower}.${ettNameCamel};
+import ${basePackageImport}.model.dto.request.${ettNameCamel}Request;
+import ${basePackageImport}.model.dto.${ettNameLower}.${ettNameCamel}Dto;
 #set($uniqueEttRef = [])
 #foreach($ppt in $ppts)
 #set($ref = $ppt.refType)
@@ -19,22 +19,18 @@ import ${basePackage}.${mdlNameLower}.${ettNameLower}.entity.${ettNamePpt};
 #foreach($ettRef in $uniqueEttRef)
 #if($ettRef.isBlank())
 #else
-import ${basePackage}.${mdlNameLower}.$textUtils.wordsToLowerCase(${ettRef.toString()}).concat(".dto.").concat($textUtils.wordsToCamelFirstUpper(${ettRef.toString()})).concat("Dto;")
+import ${basePackageImport}.model.dto.$textUtils.wordsToLowerCase(${ettRef.toString()}).$textUtils.wordsToCamelFirstUpper(${ettRef.toString()}).concat("Dto;")
 #end
 #end
 
 import java.util.List;
 
-public interface ${ettNamePpt}Service {
-    String taoMoi(${ettNamePpt}Request request);
+public interface ${ettNameCamel}Service {
+    Object update(${ettNameCamel}Request request) throws BusinessException;
 
-    void capNhat(${ettNamePpt}Request request) throws BaseException;
+    Paging<${ettNameCamel}Dto> advanceSearch(${ettNameCamel}Request request, Pageable pageable);
 
-    Page<${ettNamePpt}> timKiemNangCao(${ettNamePpt}Request request, Pageable pageable);
-
-    void xoa(String id) throws BaseException;
-
-    void duyet(String id) throws BaseException;
+    Object delete(String id) throws BusinessException;
 
 #foreach($ppt in $ppts)
 #set($namePptCamel = $textUtils.wordsToCamel(${ppt.nameProperty}))
@@ -42,10 +38,10 @@ public interface ${ettNamePpt}Service {
 #set($canFilterBy = $ppt.canFilterBy)
 #if($ref.isBlank() && $canFilterBy.isBlank())
 #elseif($ref.isBlank() && $canFilterBy == 'TRUE')
-    List<${ppt.entityKey}Dto> timTheo$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException;
+    List<${ppt.entityKey}Dto> findBy$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BusinessException;
 
 #elseif($ref != ${ppt.entityKey} && $canFilterBy == 'TRUE')
-    List<${ppt.refType}Dto> tim${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BaseException;
+    List<${ppt.refType}Dto> find${ppt.refType}By$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty})) throws BusinessException;
 
 #end
 #end

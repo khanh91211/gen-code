@@ -1,4 +1,4 @@
-package ${basePackage}.${mdlNameLower}.${ettNameLower}.service;
+package ${basePackage}.${ettNameLower}.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +13,10 @@ import ${basePackage}.common.exception.BaseException;
 import ${basePackage}.common.data.service.BaseJdbcServiceImpl;
 import ${basePackage}.common.util.CommonUtil;
 import ${basePackage}.common.util.SearchUtil;
-import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Dto;
-import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Request;
-import ${basePackage}.${mdlNameLower}.${ettNameLower}.entity.${ettNamePpt};
-import ${basePackage}.${mdlNameLower}.${ettNameLower}.repo.${ettNamePpt}Repo;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNameCamel}Dto;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNameCamel}Request;
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.entity.${ettNameCamel};
+import ${basePackage}.${mdlNameLower}.${ettNameLower}.repo.${ettNameCamel}Repo;
 #set($uniqueEttRef = [])
 #foreach($ppt in $ppts)
 #set($ref = $ppt.refType)
@@ -42,11 +42,11 @@ import java.util.UUID;
 
 @Service
 @Transactional
-public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt}, String> implements ${ettNamePpt}Service {
+public class ${ettNameCamel}ServiceImpl extends BaseJdbcServiceImpl<${ettNameCamel}, String> implements ${ettNameCamel}Service {
 
-    private final Logger log = LoggerFactory.getLogger(${ettNamePpt}ServiceImpl.class);
+    private final Logger log = LoggerFactory.getLogger(${ettNameCamel}ServiceImpl.class);
 
-    private ${ettNamePpt}Repo ${ettNameCamel}Repo;
+    private ${ettNameCamel}Repo ${ettNameCamel}Repo;
 #set($repoEx = "")
 #set($repoExtend = "")
 #foreach($ettRef in $uniqueEttRef)
@@ -61,11 +61,11 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
 #end
 #end
 #if( $repoExtend.isBlank())
-    public ${ettNamePpt}ServiceImpl(DataSource dataSource, EntityManager entityManager, ${ettNamePpt}Repo ${ettNameCamel}Repo) {
+    public ${ettNameCamel}ServiceImpl(DataSource dataSource, EntityManager entityManager, ${ettNameCamel}Repo ${ettNameCamel}Repo) {
 #else
-    public ${ettNamePpt}ServiceImpl(DataSource dataSource, EntityManager entityManager, ${ettNamePpt}Repo ${ettNameCamel}Repo, $repoExtend) {
+    public ${ettNameCamel}ServiceImpl(DataSource dataSource, EntityManager entityManager, ${ettNameCamel}Repo ${ettNameCamel}Repo, $repoExtend) {
 #end
-        super(dataSource, entityManager, ${ettNamePpt}.class);
+        super(dataSource, entityManager, ${ettNameCamel}.class);
         this.${ettNameCamel}Repo = ${ettNameCamel}Repo;
 #foreach($ettRef in $uniqueEttRef)
 #if($ettRef.isBlank())
@@ -76,9 +76,9 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
     }
 
     @Override
-    public String taoMoi(${ettNamePpt}Request request) {
-        log.debug("Yeu cau taoMoi ${ettNamePpt} : {}", request);
-        ${ettNamePpt} ett = new ${ettNamePpt}();
+    public String taoMoi(${ettNameCamel}Request request) {
+        log.debug("Yeu cau taoMoi ${ettNameCamel} : {}", request);
+        ${ettNameCamel} ett = new ${ettNameCamel}();
         BeanUtils.copyProperties(request, ett);
         ett.setId(UUID.randomUUID().toString());
         ${ettNameCamel}Repo.save(ett);
@@ -86,22 +86,22 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
     }
 
     @Override
-    public void capNhat(${ettNamePpt}Request request) throws BaseException {
-        log.debug("Yeu cau capNhat ${ettNamePpt} : {}", request);
+    public void capNhat(${ettNameCamel}Request request) throws BaseException {
+        log.debug("Yeu cau capNhat ${ettNameCamel} : {}", request);
         if (CommonUtil.isNullOrEmpty(request.getId())) {
             throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, request.getId(), null);
         }
-        ${ettNamePpt} ett = new ${ettNamePpt}();
+        ${ettNameCamel} ett = new ${ettNameCamel}();
         BeanUtils.copyProperties(request, ett);
         ${ettNameCamel}Repo.save(ett);
     }
 
     @Override
-    public Page<${ettNamePpt}> timKiemNangCao(${ettNamePpt}Request request, Pageable pageable) {
-        log.debug("Yeu cau timKiemNangCao ${ettNamePpt} : {}", request);
-        List<Specification<${ettNamePpt}>> list = getAdvanceSearchSpecList(request);
+    public Page<${ettNameCamel}> timKiemNangCao(${ettNameCamel}Request request, Pageable pageable) {
+        log.debug("Yeu cau timKiemNangCao ${ettNameCamel} : {}", request);
+        List<Specification<${ettNameCamel}>> list = getAdvanceSearchSpecList(request);
         if(!CommonUtil.listIsEmptyOrNull(list)){
-            Specification<${ettNamePpt}> spec = list.get(0);
+            Specification<${ettNameCamel}> spec = list.get(0);
             for (int i = 1; i < list.size(); i++) {
                 spec = spec.and(list.get(i));
             }
@@ -111,9 +111,9 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
         }
     }
 
-    private List<Specification<${ettNamePpt}>> getAdvanceSearchSpecList(
-            ${ettNamePpt}Request request) {
-        List<Specification<${ettNamePpt}>> spec = new ArrayList<>();
+    private List<Specification<${ettNameCamel}>> getAdvanceSearchSpecList(
+            ${ettNameCamel}Request request) {
+        List<Specification<${ettNameCamel}>> spec = new ArrayList<>();
 #foreach($ppt in $ppts)
 #if($ppt.required == 'TRUE')
 #if($ppt.type == 'String')
@@ -132,7 +132,7 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
 
     @Override
     public void xoa(String id) throws BaseException {
-        log.debug("Yeu cau xoa ${ettNamePpt} : {}", id);
+        log.debug("Yeu cau xoa ${ettNameCamel} : {}", id);
         if (CommonUtil.isNullOrEmpty(id)) {
             throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, id, null);
         }
@@ -141,7 +141,7 @@ public class ${ettNamePpt}ServiceImpl extends BaseJdbcServiceImpl<${ettNamePpt},
 
     @Override
     public void duyet(String id) throws BaseException {
-        log.debug("Yeu cau duyet ${ettNamePpt} : {}", id);
+        log.debug("Yeu cau duyet ${ettNameCamel} : {}", id);
         if (CommonUtil.isNullOrEmpty(id)) {
             throw new BaseException(ErrorEnum.APP_VALID_ERROR_IS_NOT_NULL, id, null);
         }

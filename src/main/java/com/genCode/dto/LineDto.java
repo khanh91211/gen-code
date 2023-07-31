@@ -1,11 +1,9 @@
 package com.genCode.dto;
 
-public class ModuleDto {
+public class LineDto {
     private String isActive;
     private String nameEn;
     private String nameVi;
-    private String port;
-    private String prefix;
 
     //get set
 
@@ -31,21 +29,5 @@ public class ModuleDto {
 
     public void setNameVi(String nameVi) {
         this.nameVi = nameVi;
-    }
-
-    public String getPort() {
-        return port;
-    }
-
-    public void setPort(String port) {
-        this.port = port;
-    }
-
-    public String getPrefix() {
-        return prefix;
-    }
-
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
     }
 }

@@ -1,11 +1,10 @@
-package ${basePackage}.${mdlNameLower}.${ettNameLower}.dto;
+package ${basePackageImport}.model.dto.${ettNameLower};
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 #foreach($ppt in $ppts)
 #if($ppt.type == 'Date')
 import java.util.Date;
@@ -17,14 +16,12 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ${ettNamePpt}Dto implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class ${ettFirstUpperCamel}Dto {
 #foreach($ppt in $ppts)
-#if($ppt.type == 'id' && $ptt.refType != '')
-    private String $textUtils.wordsToCamel(${ppt.nameProperty});
+#if($ppt.nameDisplay.isBlank())
 #else
+    @ApiModelProperty(value = "${ppt.nameDisplay}", example = "")
+#end
     private ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty});
 #end
-#end
-
 }

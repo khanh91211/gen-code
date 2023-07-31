@@ -1,40 +1,10 @@
-package ${basePackage}.${mdlNameLower}.${ettNameLower}.repo;
+package ${basePackage}.${ettNameLower}.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import ${basePackage}.${mdlNameLower}.${ettNameLower}.entity.${ettNamePpt};
-import ${basePackage}.${mdlNameLower}.${ettNameLower}.dto.${ettNamePpt}Dto;
-
-import java.util.List;
+import ${basePackageImport}.model.entity.${ettNameLower}.${ettFirstUpperCamel};
 
 @Repository
-public interface ${ettNamePpt}Repo extends JpaRepository<${ettNamePpt}, String> , JpaSpecificationExecutor<${ettNamePpt}>{
-    @Modifying
-    @Query("Update ${ettNamePpt} ett set ett.status = :status where ett.id = :id")
-    void duyet(@Param("status") String status, @Param("id") String id);
-
-#foreach($ppt in $ppts)
-#set($ref = $ppt.refType)
-#set($canFilterBy = $ppt.canFilterBy)
-#if($ref.isBlank() && $canFilterBy.isBlank())
-#elseif($ref.isBlank() && $canFilterBy == 'TRUE')
-    List<${ppt.entityKey}Dto> findBy$textUtils.wordsToCamelFirstUpper(${ppt.nameProperty})(${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty}));
-
-#elseif($ref != ${ppt.entityKey} && $canFilterBy == 'TRUE')
-#end
-#end
-#foreach($pt in $pptAll)
-#set($ref = $pt.refType)
-#set($canFilterBy = $pt.canFilterBy)
-#if($ref.isBlank() && $canFilterBy.isBlank())
-#elseif($ref.isBlank() && $canFilterBy == 'TRUE')
-#elseif($ref != ${pt.entityKey} && $pt.entityKey != ${ett.nameProperty} && $ref != ${pt.entityKey} && $canFilterBy == 'TRUE')
-    List<${pt.refType}Dto> find${pt.refType}By$textUtils.wordsToCamelFirstUpper(${pt.nameProperty})(${pt.type} $textUtils.wordsToCamel(${pt.nameProperty}));
-
-#end
-#end
+public interface ${ettFirstUpperCamel}Repo extends JpaRepository<${ettFirstUpperCamel}, String> , JpaSpecificationExecutor<${ettFirstUpperCamel}>{
 }

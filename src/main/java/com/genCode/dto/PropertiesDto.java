@@ -1,7 +1,8 @@
 package com.genCode.dto;
 
 public class PropertiesDto {
-    private String module;
+    private String lineKey;
+    private String typeKey;
     private String entityKey;
     private String nameProperty;
     private String nameColumn;
@@ -11,24 +12,30 @@ public class PropertiesDto {
     private String required;
     private String min;
     private String max;
-    private String pattern;
-    private String toString;
-    private String showOnTable;
+    private String annotation;
     private String canAdd;
     private String canUpdate;
     private String canFilter;
     private String canSort;
-    private String canFilterBy;
+    private String idType;
 
 
     //get set
 
-    public String getModule() {
-        return module;
+    public String getLineKey() {
+        return lineKey;
     }
 
-    public void setModule(String module) {
-        this.module = module;
+    public void setLineKey(String lineKey) {
+        this.lineKey = lineKey;
+    }
+
+    public String getTypeKey() {
+        return typeKey;
+    }
+
+    public void setTypeKey(String typeKey) {
+        this.typeKey = typeKey;
     }
 
     public String getEntityKey() {
@@ -103,28 +110,12 @@ public class PropertiesDto {
         this.max = max;
     }
 
-    public String getPattern() {
-        return pattern;
+    public String getAnnotation() {
+        return annotation;
     }
 
-    public void setPattern(String pattern) {
-        this.pattern = pattern;
-    }
-
-    public String getToString() {
-        return toString;
-    }
-
-    public void setToString(String toString) {
-        this.toString = toString;
-    }
-
-    public String getShowOnTable() {
-        return showOnTable;
-    }
-
-    public void setShowOnTable(String showOnTable) {
-        this.showOnTable = showOnTable;
+    public void setAnnotation(String annotation) {
+        this.annotation = annotation;
     }
 
     public String getCanAdd() {
@@ -159,11 +150,11 @@ public class PropertiesDto {
         this.canSort = canSort;
     }
 
-    public String getCanFilterBy() {
-        return canFilterBy;
+    public String getIdType() {
+        return idType;
     }
 
-    public void setCanFilterBy(String canFilterBy) {
-        this.canFilterBy = canFilterBy;
+    public void setIdType(String idType) {
+        this.idType = idType;
     }
 }

@@ -1,10 +1,9 @@
-package ${basePackage}.${mdlNameLower}.${ettNameLower}.entity;
+package ${basePackageImport}.model.entity.${ettNameLower};
 
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 #foreach($ppt in $ppts)
 #if($ppt.type == 'Date')
 import java.util.Date;
@@ -12,22 +11,27 @@ import java.util.Date;
 #end
 #end
 
-import ${basePackage}.model.common.EntityBase;
-
 @Getter
 @Setter
-@Entity(name = "${ettNamePpt}")
-@Table(name = "$textUtils.wordsToSnakeUpper(${mdl.prefix}).concat("_").concat($textUtils.wordsToSnakeUpper(${ett.nameProperty}))")
-public class ${ettNamePpt} extends EntityBase implements Serializable {
-   private static final long serialVersionUID = 1L;
+@Entity
+#set($ettNameUpper = $textUtils.wordsToSnakeUpper(${ett.lineKey}).concat("_").concat($textUtils.wordsToSnakeUpper(${ett.typeKey})).concat("_").concat($textUtils.wordsToSnakeUpper(${ett.entityKey})))
+@Table(name = "${ettNameUpper}")
+public class ${ettFirstUpperCamel} {
 #foreach($ppt in $ppts)
-#if($ppt.type == 'id' && $ptt.refType != '')
+#if($ptt.refType != '' && $ppt.idType == 'seq')
+    @Id
     @Column(name = "$textUtils.wordsToSnakeUpper(${ppt.nameColumn})")
+    @SequenceGenerator(name = "${ettNameUpper}_GENERATOR", sequenceName = "SEQ_${ettNameUpper}", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "${ettNameUpper}_GENERATOR")
+    private long $textUtils.wordsToCamel(${ppt.nameProperty});
+#elseif($ptt.refType != '' && $ppt.idType == 'uuid')
+    @Id
+    @Column(name = "$textUtils.wordsToSnakeUpper(${ppt.nameColumn})")
+    @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id-generator")
+    @GenericGenerator(name = "custom-id-generator", strategy = "com.mbv.model.CustomIdGenerator")
     private String $textUtils.wordsToCamel(${ppt.nameProperty});
 #else
-#if($ppt.type == 'Date')
-    @Temporal(TemporalType.DATE)
-#end
+    @Basic
     @Column(name = "$textUtils.wordsToSnakeUpper(${ppt.nameColumn})")
     private ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty});
 #end
