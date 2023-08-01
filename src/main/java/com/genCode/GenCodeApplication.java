@@ -201,18 +201,15 @@ public class GenCodeApplication {
                                         propertiesDto.setAnnotation(formatter.formatCellValue(cell));
                                         break;
                                     case 12:
-                                        propertiesDto.setCanAdd(formatter.formatCellValue(cell));
-                                        break;
-                                    case 13:
-                                        propertiesDto.setCanUpdate(formatter.formatCellValue(cell));
-                                        break;
-                                    case 14:
                                         propertiesDto.setCanFilter(formatter.formatCellValue(cell));
                                         break;
-                                    case 15:
-                                        propertiesDto.setCanSort(formatter.formatCellValue(cell));
+                                    case 13:
+                                        propertiesDto.setIsCatalog(formatter.formatCellValue(cell));
                                         break;
-                                    case 16:
+                                    case 14:
+                                        propertiesDto.setCheckEmpty(formatter.formatCellValue(cell));
+                                        break;
+                                    case 15:
                                         propertiesDto.setIdType(formatter.formatCellValue(cell));
                                         break;
                                     default: {
@@ -257,9 +254,11 @@ public class GenCodeApplication {
                         VelocityContext context = new VelocityContext();
                         context.put("basePackage", basePackage);
                         context.put("basePackageImport", basePackageImport);
+                        context.put("ettsOfPck", listEntityModule);
                         List<PropertiesDto> listProEntityModule = propertiesDtos.stream().filter(c -> c.getEntityKey().equals(ett.getEntityKey()) && c.getLineKey().equals(ett.getLineKey())).collect(Collectors.toList());
                         context.put("ppts", listProEntityModule);
                         context.put("pckNameLower", TextUtils.wordsToLowerCase(pck.getNameEn()));
+                        context.put("pckFirstUpperCamel", TextUtils.wordsToCamelFirstUpper(pck.getNameEn()));
                         context.put("ettRequestMapping", TextUtils.wordsToKebabLower(ett.getEntityKey()));
                         context.put("ettNameCamel", TextUtils.wordsToCamel(ett.getEntityKey()));
                         context.put("ettFirstUpperCamel", TextUtils.wordsToCamelFirstUpper(ett.getEntityKey()));
@@ -308,18 +307,22 @@ public class GenCodeApplication {
                                 exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), "Request".toLowerCase(), "Search"+TextUtils.wordsToNoSpace(ett.getEntityKey()) + "Request", writerSearchRq.toString());
                             }
                         }
-//                        if ("TRUE".equals(ett.getGenService())) {
-////                            typeClass = "Service";
-////                            StringWriter writer = new StringWriter();
-////                            Velocity.evaluate(context, writer, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
-////                            // In kết quả
-////                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()),TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writer.toString());
-//                            typeClass = "ServiceImpl";
-//                            StringWriter writerImpl = new StringWriter();
-//                            Velocity.evaluate(context, writerImpl, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                        if ("TRUE".equals(ett.getGenService())) {
+                            typeClass = "TypeEnum";
+                            StringWriter writerTypeEnum = new StringWriter();
+                            Velocity.evaluate(context, writerTypeEnum, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                            // In kết quả
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), "enum".toLowerCase(), TextUtils.wordsToNoSpace(pck.getNameEn()) + typeClass, writerTypeEnum.toString());//                            typeClass = "Service";
+//                            StringWriter writer = new StringWriter();
+//                            Velocity.evaluate(context, writer, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
 //                            // In kết quả
-//                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writerImpl.toString());
-//                        }
+//                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()),TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writer.toString());
+                            typeClass = "ServiceImpl";
+                            StringWriter writerImpl = new StringWriter();
+                            Velocity.evaluate(context, writerImpl, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                            // In kết quả
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writerImpl.toString());
+                        }
                         if ("TRUE".equals(ett.getGenRepo())) {
                             typeClass = "Repo";
                             StringWriter writer = new StringWriter();
@@ -368,8 +371,13 @@ public class GenCodeApplication {
                     }
                 }
             }
-            context.put("lstHeader", lstHeader.stream().map(item -> "\"" + item + "\"").collect(Collectors.joining(", ")));
-            context.put("headerSize", headerSize);
+            context.put("lstHeaderString", lstHeader.stream().map(item -> "\"" + item + "\"").collect(Collectors.joining(", ")));
+            context.put("lstHeader", lstHeader);
+            context.put("headerSize", headerSize - 1);
+        } else {
+            context.put("lstHeaderString", null);
+            context.put("lstHeader", null);
+            context.put("headerSize", null);
         }
     }
 

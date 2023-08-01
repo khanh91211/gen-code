@@ -13,10 +13,9 @@ public class PropertiesDto {
     private String min;
     private String max;
     private String annotation;
-    private String canAdd;
-    private String canUpdate;
     private String canFilter;
-    private String canSort;
+    private String isCatalog;
+    private String checkEmpty;
     private String idType;
 
 
@@ -118,22 +117,6 @@ public class PropertiesDto {
         this.annotation = annotation;
     }
 
-    public String getCanAdd() {
-        return canAdd;
-    }
-
-    public void setCanAdd(String canAdd) {
-        this.canAdd = canAdd;
-    }
-
-    public String getCanUpdate() {
-        return canUpdate;
-    }
-
-    public void setCanUpdate(String canUpdate) {
-        this.canUpdate = canUpdate;
-    }
-
     public String getCanFilter() {
         return canFilter;
     }
@@ -142,19 +125,27 @@ public class PropertiesDto {
         this.canFilter = canFilter;
     }
 
-    public String getCanSort() {
-        return canSort;
-    }
-
-    public void setCanSort(String canSort) {
-        this.canSort = canSort;
-    }
-
     public String getIdType() {
         return idType;
     }
 
     public void setIdType(String idType) {
         this.idType = idType;
+    }
+
+    public String getIsCatalog() {
+        return isCatalog;
+    }
+
+    public void setIsCatalog(String isCatalog) {
+        this.isCatalog = isCatalog;
+    }
+
+    public String getCheckEmpty() {
+        return checkEmpty;
+    }
+
+    public void setCheckEmpty(String checkEmpty) {
+        this.checkEmpty = checkEmpty;
     }
 }
