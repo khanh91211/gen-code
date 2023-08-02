@@ -1,4 +1,4 @@
-package ${basePackage}.${ettNameLower}.ctrl;
+package ${basePackage}.${pckNameLower}.ctrl;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ import ${basePackageImport}.model.dto.${pckNameLower}.${ettFirstUpperCamel}Dto;
 @Tag(name = "${ettFirstUpperCamel} Controller")
 public class ${ettFirstUpperCamel}Ctrl extends BaseController {
     @Autowired
-    private ${ettFirstUpperCamel}CommonService ${ettNameCamel}Service;
+    private ${pckFirstUpperCamel}CommonService ${pckNameLower}Service;
 
     /**
         * Upload from request
@@ -51,7 +51,7 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
     public SuccessResponse<UploadFileResponse> upload(
             @Valid @RequestParam("file") MultipartFile file,
             @RequestParam("data") String data, @RequestParam(required = false) Long id) throws IOException, BusinessException {
-        return RequestUtil.ok(${ettNameCamel}Service.upload(file, data, id, this.getUsername()));
+        return RequestUtil.ok(${pckNameLower}Service.upload(file, data, id, this.getUsername()));
     }
 
     /**
@@ -64,7 +64,7 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
     @PostMapping(value = "/approve")
     @ResponseBody
     public SuccessResponse<String> approve(@Valid @RequestBody ApproveRequest request) throws BusinessException {
-        return RequestUtil.ok(${ettNameCamel}Service.approve(request, this.getUsername(), this.getRoles()));
+        return RequestUtil.ok(${pckNameLower}Service.approve(request, this.getUsername(), this.getRoles()));
     }
 
     /**
@@ -77,7 +77,7 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
     @GetMapping(value = "/download")
     @ResponseStatus(HttpStatus.OK)
     public Object download(@RequestParam("id") Long ${ettNameLower}Id) throws IOException, BusinessException {
-        return ${ettNameCamel}Service.download(${ettNameLower}Id);
+        return ${pckNameLower}Service.download(${ettNameLower}Id);
     }
 
     /**
@@ -89,7 +89,7 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
     @ApiOperation("Delete ${ettNameCamel}")
     @DeleteMapping("/{id}/delete")
     public SuccessResponse<Object> delete(@Valid @PathVariable String id) throws BusinessException {
-        return RequestUtil.ok(${ettNameCamel}Service.delete(id, this.getRoles));
+        return RequestUtil.ok(${pckNameLower}Service.delete(id, this.getRoles));
     }
 
     /**
@@ -104,14 +104,14 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
     @ApiOperation("Search ${ettNameCamel}")
     @PostMapping("/advance-search")
     public SuccessResponse<Paging<${ettFirstUpperCamel}Dto>> advanceSearch(
-            @Valid @RequestBody ${ettFirstUpperCamel}Request request,
+            @Valid @RequestBody Search${ettFirstUpperCamel}Request request,
             @PositiveOrZero @RequestParam(required = false, defaultValue = "0") @ApiParam(example = "0") Integer page,
             @Positive @RequestParam(required = false) @ApiParam(example = "10") @Max(100) Integer size,
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) @ApiParam(example = "DESC") SortOrderEnum order
     ) {
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
-        return RequestUtil.ok(${ettNameCamel}Service.advanceSearch(request, pageable, this.getRoles));
+        return RequestUtil.ok(${pckNameLower}Service.advanceSearch(request, pageable, this.getRoles));
     }
 
     /**
@@ -123,6 +123,6 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
     @GetMapping(value = "/{id}")
     @ResponseBody
     public SuccessResponse<${ettFirstUpperCamel}> findById(@PathVariable("id") Long id) {
-        return RequestUtil.ok(${ettNameCamel}Service.findById(id));
+        return RequestUtil.ok(${pckNameLower}Service.findById(id));
     }
 }

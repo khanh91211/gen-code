@@ -258,10 +258,10 @@ public class GenCodeApplication {
                         List<PropertiesDto> listProEntityModule = propertiesDtos.stream().filter(c -> c.getEntityKey().equals(ett.getEntityKey()) && c.getLineKey().equals(ett.getLineKey())).collect(Collectors.toList());
                         context.put("ppts", listProEntityModule);
                         context.put("pckNameLower", TextUtils.wordsToLowerCase(pck.getNameEn()));
-                        context.put("pckFirstUpperCamel", TextUtils.wordsToCamelFirstUpper(pck.getNameEn()));
+                        context.put("pckFirstUpperCamel", TextUtils.toPascalCase(pck.getNameEn()));
                         context.put("ettRequestMapping", TextUtils.wordsToKebabLower(ett.getEntityKey()));
                         context.put("ettNameCamel", TextUtils.wordsToCamel(ett.getEntityKey()));
-                        context.put("ettFirstUpperCamel", TextUtils.wordsToCamelFirstUpper(ett.getEntityKey()));
+                        context.put("ettFirstUpperCamel", TextUtils.toPascalCase(ett.getEntityKey()));
                         context.put("ettNameLower", TextUtils.wordsToLowerCase(ett.getEntityKey()));
 
                         context.put("pck", pck);
@@ -286,7 +286,7 @@ public class GenCodeApplication {
                             StringWriter writer = new StringWriter();
                             Velocity.evaluate(context, writer, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                             // In kết quả
-                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writer.toString());
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()), writer.toString());
                             typeClass = "Dto";
                             StringWriter writerDto = new StringWriter();
                             Velocity.evaluate(context, writerDto, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
@@ -312,16 +312,22 @@ public class GenCodeApplication {
                             StringWriter writerTypeEnum = new StringWriter();
                             Velocity.evaluate(context, writerTypeEnum, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                             // In kết quả
-                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), "enum".toLowerCase(), TextUtils.wordsToNoSpace(pck.getNameEn()) + typeClass, writerTypeEnum.toString());//                            typeClass = "Service";
-//                            StringWriter writer = new StringWriter();
-//                            Velocity.evaluate(context, writer, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), "enum".toLowerCase(), TextUtils.wordsToNoSpace(pck.getNameEn()) + typeClass, writerTypeEnum.toString());
+//                            typeClass = "CommonService";
+//                            StringWriter writerComService = new StringWriter();
+//                            Velocity.evaluate(context, writerComService, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
 //                            // In kết quả
-//                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()),TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writer.toString());
+//                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()),TextUtils.wordsToLowerCase(ett.getEntityKey()), "Service".toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writerComService.toString());
+//                            typeClass = "CommonServiceImpl";
+//                            StringWriter writerComServiceImpl = new StringWriter();
+//                            Velocity.evaluate(context, writerComServiceImpl, "gen"+typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
+//                            // In kết quả
+//                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()),TextUtils.wordsToLowerCase(ett.getEntityKey()), "Service/impl".toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writerComServiceImpl.toString());
                             typeClass = "ServiceImpl";
                             StringWriter writerImpl = new StringWriter();
                             Velocity.evaluate(context, writerImpl, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                             // In kết quả
-                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writerImpl.toString());
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), "Service/impl".toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writerImpl.toString());
                         }
                         if ("TRUE".equals(ett.getGenRepo())) {
                             typeClass = "Repo";
@@ -384,7 +390,7 @@ public class GenCodeApplication {
     private static void exportFile(String moduleName, String packageName, String packageClassName, String fileName, String contentFile) throws IOException {
         //tao package neu chưa có
         String desktopPath = FileSystemView.getFileSystemView().getHomeDirectory() + "/Desktop/";
-        String packagePath = desktopPath + moduleName + "/" + basePackage.replace(".", "/") + "/" + moduleName + "/" + packageName + "/" + packageClassName;
+        String packagePath = desktopPath + moduleName + "/" + basePackage.replace(".", "/") + "/" + moduleName + "/" + packageClassName;
         File packageDir = new File(packagePath);
         if (packageDir.exists()) {
             System.out.println("Package directory already exists: " + packagePath);

@@ -1,4 +1,4 @@
-package ${basePackageImport}.model.dto.${ettNameLower};
+package ${basePackageImport}.model.dto.${pckNameLower};
 
 import lombok.Getter;
 import lombok.Setter;
@@ -42,6 +42,7 @@ import ${basePackageImport}.model.annotation.$textUtils.wordsToCamelFirstUpper($
 @ToString(includeFieldNames = true)
 public class ${ettFirstUpperCamel}Request {
 #foreach($ppt in $ppts)
+#if($textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'APPROVER' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'APPROVED_DATE' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'CREATOR' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'CREATED_DATE' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'MODIFIED_DATE' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'MODIFIED_BY')
 #if($ppt.min != '' && $ppt.min != ' ' && $ppt.max != '' && $ppt.max != ' ')
     @Size(min = ${ppt.min}, max = ${ppt.max})
 #elseif($ppt.min != '')
@@ -60,5 +61,6 @@ public class ${ettFirstUpperCamel}Request {
     @ApiModelProperty(value = "${ppt.nameDisplay}", example = "")
 #end
     private ${ppt.type} $textUtils.wordsToCamel(${ppt.nameProperty});
+#end
 #end
 }

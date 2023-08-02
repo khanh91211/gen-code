@@ -1,5 +1,7 @@
 package com.genCode.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,10 +26,23 @@ public class TextUtils {
     return adjOutput(words.replace(" ", ""));
   }
 
-  public static String wordsToCamel(String words) {
-    String t = words.replace(" ", "");
-    t = t.substring(0, 1).toLowerCase() + t.substring(1);
-    return adjOutput(t);
+  public static String wordsToCamel(String input) {
+    StringBuilder camelCase = new StringBuilder();
+
+    boolean capitalizeNext = false;
+
+    for (char c : input.toCharArray()) {
+      if (Character.isWhitespace(c) || c == '_') {
+        capitalizeNext = true;
+      } else if (capitalizeNext) {
+        camelCase.append(Character.toUpperCase(c));
+        capitalizeNext = false;
+      } else {
+        camelCase.append(Character.toLowerCase(c));
+      }
+    }
+
+    return camelCase.toString();
   }
 
   public static String wordsToCamelFirstUpper(String words) {
@@ -73,5 +88,44 @@ public class TextUtils {
       return "_" + str;
     }
     return str;
+  }
+
+  public static String toPascalCase(String input) {
+    if (input == null || input.isEmpty()) {
+      return input;
+    }
+
+    StringBuilder result = new StringBuilder();
+    boolean capitalizeNext = true;
+
+    for (char c : input.toCharArray()) {
+      if (Character.isWhitespace(c) || c == '-' || c == '_') {
+        capitalizeNext = true;
+      } else if (capitalizeNext) {
+        result.append(Character.toUpperCase(c));
+        capitalizeNext = false;
+      } else {
+        result.append(Character.toLowerCase(c));
+      }
+    }
+
+    return result.toString();
+  }
+
+  public static String removeAccentAndUpper(String input){
+    String strRemovedAcc = StringUtils.stripAccents(input);
+    return adjOutput(strRemovedAcc.replace(" ", "_").toUpperCase());
+  }
+
+  public static String checkAccentSql(String input){
+    // Loại bỏ khoảng trắng ở cuối chuỗi (nếu có)
+    String trimmed = input.trim();
+
+    // Kiểm tra và xóa dấu phẩy ở cuối chuỗi (nếu có)
+    if (trimmed.endsWith(",")) {
+      trimmed = trimmed.substring(0, trimmed.length() - 1);
+    }
+
+    return trimmed;
   }
 }

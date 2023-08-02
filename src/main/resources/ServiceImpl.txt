@@ -1,10 +1,11 @@
-package ${basePackage}.${ettNameLower}.service.impl;
+package ${basePackage}.${pckNameLower}.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.transaction.annotation.Transactional;
 import com.monitorjbl.xlsx.StreamingReader;
 import lombok.extern.log4j.Log4j2;
 import java.io.ByteArrayInputStream;
@@ -16,13 +17,14 @@ import java.util.*;
 import ${basePackageImport}.core.util.CommonUtil;
 import ${basePackageImport}.core.util.ExcelUtil;
 import ${basePackageImport}.model.Constants;
+import ${basePackageImport}.model.dto.exception.BusinessException;
 import ${basePackageImport}.model.dto.catalog.CatalogDto;
 import ${basePackageImport}.model.entity.${pckNameLower}.${ettFirstUpperCamel};
 import ${basePackageImport}.model.entity.${pckNameLower}.${pckFirstUpperCamel};
 import ${basePackageImport}.model.enumeration.${pckFirstUpperCamel}TypeEnum;
-import ${basePackageImport}.model.dto.${pckNameLower}.Check${pckFirstUpperCamel}Dto;
-import ${basePackage}.${ettNameLower}.integration.ChCatalogClient;
-import ${basePackage}.${ettNameLower}.service.adapter.${pckFirstUpperCamel}CommonAdapter;
+import ${basePackageImport}.model.dto.${pckNameLower}.CheckUploadDto;
+import ${basePackage}.${pckNameLower}.integration.ChCatalogClient;
+import ${basePackage}.${pckNameLower}.service.adapter.${pckFirstUpperCamel}CommonAdapter;
 
 @Service
 @Log4j2
@@ -54,14 +56,13 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
     private JdbcTemplate jdbcTemplate;
 
     @Override
-    public Check${pckFirstUpperCamel}Dto check${pckFirstUpperCamel}(${pckFirstUpperCamel} ${pckNameLower}) throws IOException {
+    public CheckUploadDto check${pckFirstUpperCamel}(${pckFirstUpperCamel} ${pckNameLower}) throws IOException {
         boolean errorStatus = false;
         int countErrorRow = 0;
         List<${ettFirstUpperCamel}> listBooks = new ArrayList<>();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(${pckNameLower}.getData());
-        // Get workbook
-        Check${pckFirstUpperCamel}Dto<${ettFirstUpperCamel}> check${pckFirstUpperCamel}Dto;
 
+        CheckUploadDto<${ettFirstUpperCamel}> checkUploadDto;
         // Tạo một Workbook mới để chỉnh sửa và thêm cột mới
         try (Workbook originWorkbook = StreamingReader.builder()
                 .rowCacheSize(100)
@@ -119,39 +120,36 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
 #foreach($header in $lstHeader)
 #set($caseNum = ${foreach.index})
 #foreach($pptHd in $ppts)
-#if($header == $pptHd.nameDisplay && $pptHd.checkEmpty == 'TRUE')
+#if($textUtils.wordsToSnakeUpper($pptHd.nameColumn) == 'STATUS')
+#set($fieldStatusRef = $textUtils.toPascalCase($pptHd.nameProperty))
+#end
+#if($textUtils.wordsToSnakeUpper($pptHd.nameColumn) == 'CREATED_DATE')
+#set($fieldCreateDateRef = $textUtils.toPascalCase($pptHd.nameProperty))
+#end
+#if($textUtils.wordsToLowerCase($pptHd.refType) == ${pckNameLower})
+#set($fieldIdRef = $textUtils.toPascalCase($pptHd.nameProperty))
+#end
+#if($textUtils.wordsToLowerCase($pptHd.idType) == 'uuid' || $textUtils.wordsToLowerCase($pptHd.idType) == 'seq')
+#set($fieldId = $textUtils.toPascalCase($pptHd.nameProperty))
+#end
+#if($textUtils.removeAccentAndUpper($header) == $textUtils.removeAccentAndUpper($pptHd.nameDisplay))
                         case ${caseNum}:
                             if (cellValue != null) {
                                 modifiedCell.setCellValue(originCell.getStringCellValue());
-                                book.set$textUtils.wordsToCamelFirstUpper(${pptHd.nameProperty})(cellValue);
-                            } else {
-                                errorStatus = true;
-                                errorCellValueIsNull = setErrorCellValue(errorCell, columnIndex, errorCellValueIsNull, Constants.ErrorMessageExcel.CAN_NOT_BE_EMPTY);
-                            }
-                            break;
-#elseif($header == $pptHd.nameDisplay && $pptHd.isCatalog == 'TRUE')
-                        case ${caseNum}:
-                            if (cellValue != null) {
-                                modifiedCell.setCellValue(originCell.getStringCellValue());
-
+#if($pptHd.isCatalog == 'TRUE')
                                 List<CatalogDto> lstTitle = catalogClient.findByLineTypeCode("", "", "");
                                 String cellValueCatalog = lstTitle.stream().filter(c -> c.getLabel().equals(cellValue)).map(CatalogDto::getLabelCode).findFirst().orElse(null);
                                 if (!CommonUtil.isNullOrEmpty(cellValueCatalog)) {
-                                    book.set$textUtils.wordsToCamelFirstUpper(${pptHd.nameProperty})(cellValueCatalog);
+                                    book.set$textUtils.toPascalCase(${pptHd.nameProperty})(cellValueCatalog);
                                 } else {
                                     errorStatus = true;
                                     errorCellValueIsNull = setErrorCellValue(errorCell, columnIndex, errorCellValueIsNull, Constants.ErrorMessageExcel.INVALID_VALUE);
                                 }
-                            } else {
-                                errorStatus = true;
-                                errorCellValueIsNull = setErrorCellValue(errorCell, columnIndex, errorCellValueIsNull, Constants.ErrorMessageExcel.CAN_NOT_BE_EMPTY);
-                            }
-                            break;
-#elseif($header == $pptHd.nameDisplay && $pptHd.type == 'Date')
-                        case ${caseNum}:
-                            if (cellValue != null) {
-                                modifiedCell.setCellValue(originCell.getStringCellValue());
-                                book.set$textUtils.wordsToCamelFirstUpper(${pptHd.nameProperty})(ExcelUtil.getCellDateValue(originCell));
+#elseif($pptHd.type == 'Date')
+                                book.set$textUtils.toPascalCase(${pptHd.nameProperty})(ExcelUtil.getCellDateValue(originCell));
+#else
+                                book.set$textUtils.toPascalCase(${pptHd.nameProperty})(cellValue);
+#end
 #if($pptHd.checkEmpty == 'TRUE')
                             } else {
                                 errorStatus = true;
@@ -167,10 +165,10 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
                     }
 #end
                 }
-                book.setId(UUID.randomUUID().toString().toLowerCase());
-                book.setDocId(${pckNameLower}.getId());
-                book.setStatus(${pckNameLower}.getStatus());
-                book.setCreatedDate(${pckNameLower}.getCreatedDate());
+                book.set${fieldId}(UUID.randomUUID().toString().toLowerCase());
+                book.set${fieldIdRef}(${pckNameLower}.getId());
+                book.set${fieldStatusRef}(${pckNameLower}.getStatus());
+                book.set${fieldCreateDateRef}(${pckNameLower}.getCreatedDate());
                 listBooks.add(book);
 
                 if (errorCellValueIsNull) {
@@ -178,26 +176,26 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
                 }
             }
 
-            check${pckFirstUpperCamel}Dto = new Check${pckFirstUpperCamel}Dto<>();
+            checkUploadDto = new CheckUploadDto<>();
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             modifiedWorkbook.write(outputStream);
 
             byte[] ${pckNameLower}Data = outputStream.toByteArray();
             // nếu không có cell nào lỗi thì xuất ra file gốc, ngược lại xuất ra file lỗi
             if (!errorStatus) {
-                check${pckFirstUpperCamel}Dto.setData(document.getData());
+                checkUploadDto.setData(document.getData());
             } else {
-                check${pckFirstUpperCamel}Dto.setData(documentData);
+                checkUploadDto.setData(documentData);
             }
-            check${pckFirstUpperCamel}Dto.setErrorStatus(errorStatus);
+            checkUploadDto.setErrorStatus(errorStatus);
             if (countErrorRow > 0) {
-                check${pckFirstUpperCamel}Dto.setErrorDescription(countErrorRow + " bản ghi lỗi");
+                checkUploadDto.setErrorDescription(countErrorRow + " bản ghi lỗi");
             }
-            check${pckFirstUpperCamel}Dto.setLstDocument(listBooks);
+            checkUploadDto.setLstDocument(listBooks);
 
             inputStream.close();
         }
-        return check${pckFirstUpperCamel}Dto;
+        return checkUploadDto;
     }
 
     public boolean setErrorCellValue(Cell errorCell, int errorCellIndex, boolean hasCellNull, String error) {
@@ -210,10 +208,76 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
         return true;
     }
 
-#set($idRefCol = '')
-#set($updateStatus = '')
-#set($checkApprover = '')
-#set($checkApprovedDate = '')
+    @Override
+    @Transactional(rollbackFor = BusinessException.class)
+    public boolean saveList(List<?> input, String username) {
+        List<${ettFirstUpperCamel}> list = CommonUtil.toListObject(input, ${ettFirstUpperCamel}.class);
+        int batchSize = 5000;
+#set($uniqueFieldName = [])
+#foreach($ppt in $ppts)
+#if($textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'APPROVER' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'APPROVED_DATE' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'CREATOR' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'MODIFIED_DATE' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'MODIFIED_BY')
+#if($!{fieldSql} && $foreach.last)
+#set($fieldSql = ${fieldSql} + $textUtils.wordsToSnakeUpper($ppt.nameColumn))
+#set($addUniqueFieldName = $uniqueFieldName.add($textUtils.wordsToSnakeUpper($ppt.nameColumn)))
+#set($valueSql = ${valueSql} + "?")
+#elseif($!{fieldSql})
+#set($fieldSql = ${fieldSql} + $textUtils.wordsToSnakeUpper($ppt.nameColumn).concat(", "))
+#set($addUniqueFieldName = $uniqueFieldName.add($textUtils.wordsToSnakeUpper($ppt.nameColumn)))
+#set($valueSql = ${valueSql} + "?, ")
+#elseif($foreach.last)
+#set($fieldSql = $textUtils.wordsToSnakeUpper($ppt.nameColumn))
+#set($addUniqueFieldName = $uniqueFieldName.add($textUtils.wordsToSnakeUpper($ppt.nameColumn)))
+#set($valueSql = "?")
+#else
+#set($fieldSql = $textUtils.wordsToSnakeUpper($ppt.nameColumn).concat(", "))
+#set($addUniqueFieldName = $uniqueFieldName.add($textUtils.wordsToSnakeUpper($ppt.nameColumn)))
+#set($valueSql = "?, ")
+#end
+#end
+#end
+#if($!{fieldSql} && $!{valueSql})
+#set($fieldSqlDone = $textUtils.checkAccentSql(${fieldSql}))
+#set($valueSqlDone = $textUtils.checkAccentSql(${valueSql}))
+        String sql = "INSERT INTO NSLD_APP.${codeEnum} (${fieldSqlDone}) " +
+                "VALUES (${valueSqlDone})";
+        jdbcTemplate.batchUpdate(
+                sql,
+                list,
+                batchSize,
+                (ps, obj) -> {
+#foreach($fieldName in $uniqueFieldName)
+#set($countSaveLst = $foreach.count)
+#foreach($ppt in $ppts)
+#if($textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'APPROVER' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'APPROVED_DATE' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'CREATOR' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'MODIFIED_DATE' && $textUtils.wordsToSnakeUpper($ppt.nameColumn) != 'MODIFIED_BY')
+#if($textUtils.wordsToSnakeUpper($ppt.nameColumn) == $fieldName)
+#if($textUtils.wordsToSnakeUpper($ppt.type) == 'DATE')
+                    ps.setDate(${countSaveLst}, new java.sql.Date(obj.get$textUtils.toPascalCase(${ppt.nameProperty})().getTime()));
+#elseif($textUtils.wordsToSnakeUpper($ppt.type) == 'LONG')
+                    ps.setLong(${countSaveLst}, obj.get$textUtils.toPascalCase(${ppt.nameProperty})());
+#elseif($textUtils.wordsToSnakeUpper($ppt.type) != 'STRING')
+                    if (obj.get$textUtils.toPascalCase(${ppt.nameProperty})() != null) {
+#if($textUtils.wordsToSnakeUpper($ppt.type) == "INT" || $textUtils.wordsToSnakeUpper($ppt.type) == "INTEGER")
+                        ps.setInt(${countSaveLst}, obj.get$textUtils.toPascalCase(${ppt.nameProperty})());
+#else
+                        ps.set$textUtils.toPascalCase($ppt.type)(${countSaveLst}, obj.get$textUtils.toPascalCase(${ppt.nameProperty})());
+#end
+                    } else {
+                        ps.setNull(${countSaveLst}, Types.$textUtils.wordsToSnakeUpper($ppt.type));
+                    }
+#else
+                    ps.setString(${countSaveLst}, obj.get$textUtils.toPascalCase(${ppt.nameProperty})());
+#end
+#end
+#end
+#end
+#if($foreach.last)
+                });
+#end
+#end
+#end
+        return true;
+    }
+
 #foreach($ppt in $ppts)
 #if($textUtils.wordsToLowerCase($ppt.refType) == ${pckNameLower})
 #set($idRefCol = $textUtils.wordsToSnakeUpper($ppt.nameColumn))
@@ -230,6 +294,7 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
 #end
 #if($!{idRefCol})
     @Override
+    @Transactional(rollbackFor = BusinessException.class)
     public boolean cleanAllByTestId(Long ${pckNameLower}Id) {
         if (${pckNameLower}Id != null) {
             String sql = "DELETE FROM NSLD_APP.${codeEnum} WHERE ${idRefCol} = ?";
@@ -239,33 +304,38 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
         return false;
     }
 
+#else
 #end
-#if(${updateStatus} == 'S' && $!{idRefCol})
+#if($!{updateStatus} && $!{idRefCol})
     @Override
+    @Transactional(rollbackFor = BusinessException.class)
     public boolean updateStatus(Long ${pckNameLower}Id, String status) {
         if (${pckNameLower}Id != null) {
             String sql = "UPDATE NSLD_APP.${codeEnum} SET STATUS = ? WHERE ${idRefCol} = ?";
-            jdbcTemplate.update(sql, status, d${pckNameLower}Id);
+            jdbcTemplate.update(sql, status, ${pckNameLower}Id);
             return true;
         }
         return false;
     }
 
+#else
 #end
-#if(${checkApprover} == 'S' && ${checkApprovedDate} == 'S' && $!{idRefCol})
+#if($!{checkApprover} && $!{checkApprovedDate} && $!{idRefCol})
     @Override
+    @Transactional(rollbackFor = BusinessException.class)
     public boolean updateApproveInfo(Long ${pckNameLower}Id, String approver, Date approvedDate) {
         if (documentId != null) {
-            String sql = "UPDATE NSLD_APP.${codeEnum} SET APPROVER = ?, APPROVED_DATE = ? WHERE DOC_ID = ?";
+            String sql = "UPDATE NSLD_APP.${codeEnum} SET APPROVER = ?, APPROVED_DATE = ? WHERE ${idRefCol} = ?";
             jdbcTemplate.update(sql, approver, approvedDate, ${pckNameLower}Id);
             return true;
         }
         return false;
     }
 
+#else
 #end
     @Override
     public String getSupportService() {
-        return DocumentTypeEnum.${codeEnum}.getCode();
+        return ${pckFirstUpperCamel}TypeEnum.${codeEnum}.getCode();
     }
 }

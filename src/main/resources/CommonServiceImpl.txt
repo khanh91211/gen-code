@@ -1,0 +1,339 @@
+package ${basePackage}.test.service.impl;
+
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.PostConstruct;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.util.*;
+
+import ${basePackageImport}.core.util.DateUtils;
+import ${basePackageImport}.core.util.SearchUtil;
+import ${basePackageImport}.core.util.StringUtil;
+import ${basePackageImport}.core.util.CommonUtil;
+import ${basePackageImport}.model.Constants;
+import ${basePackageImport}.model.Paging;
+import ${basePackageImport}.model.dto.exception.BusinessException;
+import ${basePackageImport}.model.dto.request.ApproveRequest;
+import ${basePackageImport}.model.dto.request.SearchDocumentRequest;
+import ${basePackageImport}.model.dto.response.UploadFileResponse;
+import ${basePackageImport}.model.enumeration.StatusConfiguration;
+import ${basePackageImport}.model.enumeration.ValidateErrorCode;
+import ${basePackageImport}.model.enumeration.${pckFirstUpperCamel}TypeEnum;
+import ${basePackageImport}.model.dto.${pckNameLower}.CheckUploadDto;
+import ${basePackageImport}.model.dto.${pckNameLower}.DataUploadDto;
+import ${basePackageImport}.model.dto.${pckNameLower}.${pckFirstUpperCamel}Dto;
+import ${basePackageImport}.model.entity.${pckNameLower}.${pckFirstUpperCamel};
+import ${basePackage}.${pckNameLower}.repo.${pckFirstUpperCamel}Repository;
+import ${basePackage}.${pckNameLower}.service.${pckFirstUpperCamel}CommonService;
+import ${basePackage}.${pckNameLower}.service.adapter.${pckFirstUpperCamel}CommonAdapter;
+
+
+@Service
+@Log4j2
+public class ${pckFirstUpperCamel}CommonServiceImpl implements ${pckFirstUpperCamel}CommonService {
+    @Autowired
+    private List<${pckFirstUpperCamel}CommonAdapter> serviceList;
+
+    private Map<String, ${pckFirstUpperCamel}CommonAdapter> serviceMap;
+
+    @Autowired
+    private ${pckFirstUpperCamel}Repository ${pckNameLower}Repository;
+
+    /**
+     * init serviceMap
+     */
+    @PostConstruct
+    public void init() {
+        serviceMap = new HashMap<>();
+        for (${pckFirstUpperCamel}CommonAdapter svc : serviceList) {
+            serviceMap.put(svc.getSupportService(), svc);
+        }
+    }
+
+    /**
+     * Upload test
+     *
+     * @param file, data, id, username  Kênh truyền vào
+     * @return
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public UploadFileResponse upload(MultipartFile file, String data, Long id, String username) throws IOException, BusinessException {
+        ${pckFirstUpperCamel} ${pckNameLower} = new ${pckFirstUpperCamel}();
+        if (id != null) {
+            Optional<${pckFirstUpperCamel}> o${pckFirstUpperCamel} = ${pckNameLower}Repository.findById(id);
+            if (!o${pckFirstUpperCamel}.isPresent()) {
+                throw new BusinessException(ValidateErrorCode.NO_DOCUMENT_DATA);
+            }
+            ${pckNameLower} = o${pckFirstUpperCamel}.get();
+            ${pckNameLower}.setModifiedDate(new Date());
+            if (${pckNameLower}.getType() != null) {
+                ${pckFirstUpperCamel}CommonAdapter svc = serviceMap.get(${pckNameLower}.getType());
+                if (svc != null) {
+                    svc.cleanAllByTestId(id);
+                }
+            }
+        } else {
+            ${pckNameLower}.setStatus(StatusConfiguration.TMP.getStatus());
+        }
+
+        DataUploadDto data${pckFirstUpperCamel}Input = CommonUtil.stringToBean(data, DataUploadDto.class);
+        BeanUtils.copyProperties(dataTestInput, document, "id");
+        ${pckNameLower}.setFileName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
+        ${pckNameLower}.setData(file.getBytes());
+        ${pckNameLower}.setCreator(username);
+        setEndDateAndStartDate(${pckNameLower}, data${pckFirstUpperCamel}Input);
+        ${pckNameLower}Repository.saveAndFlush(${pckNameLower});
+
+        UploadFileResponse response = new UploadFileResponse();
+        CheckUploadDto<?> check${pckFirstUpperCamel}Result;
+        if (data${pckFirstUpperCamel}Input.getType() != null) {
+            ${pckFirstUpperCamel}CommonAdapter svc = serviceMap.get(dataTestInput.getType());
+            if (svc != null) {
+                check${pckFirstUpperCamel}Result = svc.checkUpload(document);
+                ${pckNameLower}.setErrorStatus(check${pckFirstUpperCamel}Result.isErrorStatus());
+                ${pckNameLower}.setErrorDescription(check${pckFirstUpperCamel}Result.getErrorDescription());
+                svc.saveList(check${pckFirstUpperCamel}Result.getLstDocument());
+            }
+        }
+        BeanUtils.copyProperties(${pckNameLower}, response);
+
+        documentRepository.saveAndFlush(${pckNameLower});
+
+        response.setId(${pckNameLower}.getId());
+        return response;
+    }
+
+    private void setEndDateAndStartDate(Document document, DataDocumentDto dataTestInput) {
+        if (!CommonUtil.isNullOrEmpty(dataTestInput.getPeriod())) {
+            String previousPeriod = DateUtils.getPreviousPeriod(dataTestInput.getPeriod());
+            try {
+                Date startDate = DateUtils.str2MonthYear(previousPeriod, 26);
+                document.setStartDate(startDate);
+                Date endDate = DateUtils.str2MonthYear(dataTestInput.getPeriod(), 25);
+                document.setEndDate(endDate);
+            } catch (ParseException e) {
+                //khong lam gi
+            }
+        } else if (dataTestInput.getStartDate() != null) {
+            document.setStartDate(dataTestInput.getStartDate());
+        }
+    }
+
+    /**
+     * Duyệt test
+     *
+     * @param request, username, roles  Kênh truyền vào
+     * @return
+     */
+    @Override
+    public String approve(ApproveRequest request, String username, List<String> roles) throws BusinessException {
+        String result = "";
+        Optional<Document> oDocument = documentRepository.findById(request.getId());
+        if (!oDocument.isPresent()) {
+            throw new BusinessException(ValidateErrorCode.RECORD_NOT_EXIST);
+        }
+
+        Document document = oDocument.get();
+        if (document.isErrorStatus()) {
+            throw new BusinessException(ValidateErrorCode.UNAVAILABLE_STATUS);
+        }
+        if (!CommonUtil.checkAvailableStatus(document.getStatus(), roles)) {
+            throw new BusinessException(ValidateErrorCode.UNAVAILABLE_STATUS);
+        }
+
+        document.setApprover(username);
+        document.setModifiedDate(new Date());
+        String status = "";
+        int approveLevel = DocumentTypeEnum.APPR_IMP_ADJUSTMENT.getCode().equals(document.getType()) ? Constants.APPROVE_THREE_LEVEL : Constants.APPROVE_TWO_LEVEL;
+        status = CommonUtil.getNextStatus(request.getApproveType(), request.getApprover(), roles, approveLevel);
+        if (CommonUtil.isNullOrEmpty(status)) {
+            throw new BusinessException(ValidateErrorCode.UNAVAILABLE_STATUS);
+        }
+        document.setStatus(status);
+
+        TestCommonAdapter svc = null;
+        if (document.getType() != null) {
+            svc = serviceMap.get(document.getType());
+        }
+        if (svc != null) {
+            svc.updateStatus(document.getId(), status);
+            if (request.getApproveType().equals("create")) {
+                result = "Đã gửi phê duyệt thành công";
+            } else if (request.getApproveType().equals("approve")) {
+                result = "Đã phê duyệt thành công";
+            } else if (request.getApproveType().equals("reject")) {
+                result = "Từ chối thành công";
+                document.setRejectReason(request.getRejectReason());
+            }
+            if (StatusConfiguration.ACTIVE.getStatus().equals(status)) {
+                document.setApprovedDate(new Date());
+                svc.updateApproveInfo(document.getId(), document.getApprover(), document.getApprovedDate());
+            }
+        }
+        documentRepository.saveAndFlush(document);
+        return result;
+    }
+
+    /**
+     * Xóa test
+     *
+     * @param id, roles  Kênh truyền vào
+     * @return
+     */
+    @Override
+    public String delete(Long id, List<String> roles) throws BusinessException {
+        Optional<Document> oDocument = documentRepository.findById(id);
+        if (oDocument.isPresent()) {
+            Document document = oDocument.get();
+            document.setModifiedDate(new Date());
+
+            if (CommonUtil.checkStatusBeforeDelete(document.getStatus(), roles)) {
+                document.setStatus(StatusConfiguration.DELETE.getStatus());
+                documentRepository.saveAndFlush(document);
+                if (document.getType() != null) {
+                    TestCommonAdapter svc = serviceMap.get(document.getType());
+                    if (svc != null) {
+                        svc.updateStatus(document.getId(), StatusConfiguration.DELETE.getStatus());
+                    }
+                }
+                return "Xoá tài liệu thành công";
+            } else {
+                throw new BusinessException(ValidateErrorCode.UNAVAILABLE_STATUS);
+            }
+        } else {
+            throw new BusinessException(ValidateErrorCode.RECORD_NOT_EXIST);
+        }
+    }
+
+    /**
+     * Tải thông tin test
+     *
+     * @param id Kênh truyền vào
+     * @return
+     */
+    @Override
+    public Object download(Long id) throws BusinessException, IOException {
+        Optional<Document> oDocument = documentRepository.findById(id);
+        if (!oDocument.isPresent()) {
+            throw new BusinessException(ValidateErrorCode.NO_DOCUMENT_DATA);
+        }
+        Document document = oDocument.get();
+        InputStream inputStream = null;
+        if (document.getType() != null) {
+            TestCommonAdapter svc = serviceMap.get(document.getType());
+            if (svc != null) {
+                CheckTestDto<?> checkTestResult = svc.checkTest(document);
+                inputStream = new ByteArrayInputStream(checkTestResult.getData());
+            }
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        List<String> headerName = new ArrayList<>();
+        headerName.add("*");
+        headers.setAccessControlExposeHeaders(headerName);
+        if (document.getFileName().endsWith("xls")) {
+            headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
+        } else {
+            headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        }
+        String name = StringUtil.removeAccents(document.getReportName());
+        headers.add("content-disposition", "attachment;documentName=" + name);
+        if (document.getFileName().endsWith("xls")) {
+            headers.setContentDispositionFormData(name, name + ".xls");
+        } else {
+            headers.setContentDispositionFormData(name, name + ".xlsx");
+        }
+        headers.add("documentName", name);
+        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+        return new ResponseEntity<>(inputStream != null ? inputStream.readAllBytes() : null, headers, HttpStatus.OK);
+    }
+
+    /**
+     * Lấy thông tin test
+     *
+     * @param id Kênh truyền vào
+     * @return
+     */
+    @Override
+    public Document findById(Long id) {
+        Optional<Document> oDocument = documentRepository.findById(id);
+        if (oDocument.isPresent()) {
+            return oDocument.get();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Tìm kiếm nâng cao
+     *
+     * @param searchRequest, pageable, roles  Kênh truyền vào
+     * @return
+     */
+    @Override
+    public Paging<DocumentDto> advanceSearch(SearchDocumentRequest searchRequest, Pageable pageable, List<String> roles) {
+        Page<Document> page;
+        List<Specification<Document>> specList = getAdvanceSearchSpecList(searchRequest, roles);
+        if (!specList.isEmpty()) {
+            Specification<Document> spec = specList.get(0);
+            for (int i = 1; i < specList.size(); i++) {
+                spec = spec.and(specList.get(i));
+            }
+            page = documentRepository.findAll(spec, pageable);
+        } else {
+            page = documentRepository.findByType(searchRequest.getType(), pageable);
+        }
+
+        Paging<DocumentDto> documentDtoPaging = new Paging<>();
+        documentDtoPaging.setItems(CommonUtil.toListObject(page.getContent(), DocumentDto.class));
+        documentDtoPaging.setPageSize(pageable.getPageSize());
+        documentDtoPaging.setPageNum(pageable.getPageNumber());
+        documentDtoPaging.setTotalCount(page.getTotalElements());
+        return documentDtoPaging;
+    }
+
+    private List<Specification<Document>> getAdvanceSearchSpecList(SearchDocumentRequest searchRequest, List<String> roles) {
+        List<Specification<Document>> specList = new ArrayList<>();
+        specList.add(SearchUtil.notEq("status", "D"));
+        if (!CommonUtil.isNullOrEmpty(searchRequest.getType()) && !roles.contains("GDV")) {
+            specList.add(SearchUtil.eq("errorStatus", false));
+        }
+        if (!CommonUtil.isNullOrEmpty(searchRequest.getLine())) {
+            specList.add(SearchUtil.eq("line", searchRequest.getLine()));
+        }
+        if (!CommonUtil.isNullOrEmpty(searchRequest.getType())) {
+            specList.add(SearchUtil.eq("type", searchRequest.getType()));
+        }
+        if (!CommonUtil.isNullOrEmpty(searchRequest.getCreator())) {
+            specList.add(SearchUtil.eq("creator", searchRequest.getCreator()));
+        }
+        if (!CommonUtil.isNullOrEmpty(searchRequest.getStatus())) {
+            specList.add(SearchUtil.eq("status", searchRequest.getStatus()));
+        }
+        if (searchRequest.getCreatedDate() != null) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(searchRequest.getCreatedDate());
+            calendar.add(Calendar.DATE, 1);
+            Date nextDay = calendar.getTime();
+            specList.add(SearchUtil.bw("createdDate", searchRequest.getCreatedDate(), nextDay));
+        }
+        return specList;
+    }
+}

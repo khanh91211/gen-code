@@ -1,7 +1,13 @@
-package ${basePackageImport}.model.entity.${ettNameLower};
+package ${basePackageImport}.model.entity.${pckNameLower};
 
 import lombok.Getter;
 import lombok.Setter;
+#foreach($ppt in $ppts)
+#if($ptt.refType != '' && $textUtils.wordsToLowerCase($ppt.idType) == 'uuid')
+import org.hibernate.annotations.GenericGenerator;
+#break
+#end
+#end
 
 import javax.persistence.*;
 #foreach($ppt in $ppts)
@@ -18,13 +24,13 @@ import java.util.Date;
 @Table(name = "${ettNameUpper}")
 public class ${ettFirstUpperCamel} {
 #foreach($ppt in $ppts)
-#if($ptt.refType != '' && $ppt.idType == 'seq')
+#if($ptt.refType != '' && $textUtils.wordsToLowerCase($ppt.idType) == 'seq')
     @Id
     @Column(name = "$textUtils.wordsToSnakeUpper(${ppt.nameColumn})")
     @SequenceGenerator(name = "${ettNameUpper}_GENERATOR", sequenceName = "SEQ_${ettNameUpper}", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "${ettNameUpper}_GENERATOR")
     private long $textUtils.wordsToCamel(${ppt.nameProperty});
-#elseif($ptt.refType != '' && $ppt.idType == 'uuid')
+#elseif($ptt.refType != '' && $textUtils.wordsToLowerCase($ppt.idType) == 'uuid')
     @Id
     @Column(name = "$textUtils.wordsToSnakeUpper(${ppt.nameColumn})")
     @GeneratedValue(strategy = GenerationType.IDENTITY, generator = "custom-id-generator")

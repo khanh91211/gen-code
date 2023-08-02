@@ -1,4 +1,4 @@
-package ${basePackageImport}.model.dto.${ettNameLower};
+package ${basePackageImport}.model.dto.${pckNameLower};
 
 import lombok.Getter;
 import lombok.Setter;
