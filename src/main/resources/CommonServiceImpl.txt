@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,31 +18,31 @@ import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.util.*;
 
-import ${basePackageImport}.core.util.DateUtils;
 import ${basePackageImport}.core.util.SearchUtil;
-import ${basePackageImport}.core.util.StringUtil;
 import ${basePackageImport}.core.util.CommonUtil;
-import ${basePackageImport}.model.Constants;
+import ${basePackageImport}.core.util.ExcelUtil;
 import ${basePackageImport}.model.Paging;
 import ${basePackageImport}.model.dto.exception.BusinessException;
 import ${basePackageImport}.model.dto.request.ApproveRequest;
-import ${basePackageImport}.model.dto.request.SearchDocumentRequest;
+import ${basePackageImport}.model.dto.${pckNameLower}.Search${pckFirstUpperCamel}Request;
 import ${basePackageImport}.model.dto.response.UploadFileResponse;
+import ${basePackageImport}.model.enumeration.ApproveMessageEnum;
 import ${basePackageImport}.model.enumeration.StatusConfiguration;
 import ${basePackageImport}.model.enumeration.ValidateErrorCode;
-import ${basePackageImport}.model.enumeration.${pckFirstUpperCamel}TypeEnum;
-import ${basePackageImport}.model.dto.${pckNameLower}.CheckUploadDto;
-import ${basePackageImport}.model.dto.${pckNameLower}.DataUploadDto;
+import ${basePackageImport}.model.dto.upload.CheckUploadDto;
+import ${basePackageImport}.model.dto.upload.DataUploadDto;
 import ${basePackageImport}.model.dto.${pckNameLower}.${pckFirstUpperCamel}Dto;
 import ${basePackageImport}.model.entity.${pckNameLower}.${pckFirstUpperCamel};
-import ${basePackage}.${pckNameLower}.repo.${pckFirstUpperCamel}Repository;
+import ${basePackage}.${pckNameLower}.repository.${pckFirstUpperCamel}Repository;
 import ${basePackage}.${pckNameLower}.service.${pckFirstUpperCamel}CommonService;
 import ${basePackage}.${pckNameLower}.service.adapter.${pckFirstUpperCamel}CommonAdapter;
 
-
+/**
+ * @author khanhtd
+ * @Date 2023
+ */
 @Service
 @Log4j2
 public class ${pckFirstUpperCamel}CommonServiceImpl implements ${pckFirstUpperCamel}CommonService {
@@ -86,58 +85,58 @@ public class ${pckFirstUpperCamel}CommonServiceImpl implements ${pckFirstUpperCa
             if (${pckNameLower}.getType() != null) {
                 ${pckFirstUpperCamel}CommonAdapter svc = serviceMap.get(${pckNameLower}.getType());
                 if (svc != null) {
-                    svc.cleanAllByTestId(id);
+                    svc.cleanAllById(id);
                 }
             }
         } else {
             ${pckNameLower}.setStatus(StatusConfiguration.TMP.getStatus());
         }
 
-        DataUploadDto data${pckFirstUpperCamel}Input = CommonUtil.stringToBean(data, DataUploadDto.class);
-        BeanUtils.copyProperties(dataTestInput, document, "id");
+        DataUploadDto dataUploadInput = CommonUtil.stringToBean(data, DataUploadDto.class);
+        BeanUtils.copyProperties(dataUploadInput, ${pckNameLower}, "id");
         ${pckNameLower}.setFileName(StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename())));
         ${pckNameLower}.setData(file.getBytes());
         ${pckNameLower}.setCreator(username);
-        setEndDateAndStartDate(${pckNameLower}, data${pckFirstUpperCamel}Input);
+//        setEndDateAndStartDate(${pckNameLower}, dataUploadInput);
         ${pckNameLower}Repository.saveAndFlush(${pckNameLower});
 
         UploadFileResponse response = new UploadFileResponse();
         CheckUploadDto<?> check${pckFirstUpperCamel}Result;
-        if (data${pckFirstUpperCamel}Input.getType() != null) {
-            ${pckFirstUpperCamel}CommonAdapter svc = serviceMap.get(dataTestInput.getType());
+        if (dataUploadInput.getType() != null) {
+            ${pckFirstUpperCamel}CommonAdapter svc = serviceMap.get(dataUploadInput.getType());
             if (svc != null) {
-                check${pckFirstUpperCamel}Result = svc.checkUpload(document);
+                check${pckFirstUpperCamel}Result = svc.checkUpload(${pckNameLower});
                 ${pckNameLower}.setErrorStatus(check${pckFirstUpperCamel}Result.isErrorStatus());
                 ${pckNameLower}.setErrorDescription(check${pckFirstUpperCamel}Result.getErrorDescription());
-                svc.saveList(check${pckFirstUpperCamel}Result.getLstDocument());
+                svc.saveList(check${pckFirstUpperCamel}Result.getLstDocument(), username);
             }
         }
         BeanUtils.copyProperties(${pckNameLower}, response);
 
-        documentRepository.saveAndFlush(${pckNameLower});
+        ${pckNameLower}Repository.saveAndFlush(${pckNameLower});
 
         response.setId(${pckNameLower}.getId());
         return response;
     }
 
-    private void setEndDateAndStartDate(Document document, DataDocumentDto dataTestInput) {
-        if (!CommonUtil.isNullOrEmpty(dataTestInput.getPeriod())) {
-            String previousPeriod = DateUtils.getPreviousPeriod(dataTestInput.getPeriod());
-            try {
-                Date startDate = DateUtils.str2MonthYear(previousPeriod, 26);
-                document.setStartDate(startDate);
-                Date endDate = DateUtils.str2MonthYear(dataTestInput.getPeriod(), 25);
-                document.setEndDate(endDate);
-            } catch (ParseException e) {
-                //khong lam gi
-            }
-        } else if (dataTestInput.getStartDate() != null) {
-            document.setStartDate(dataTestInput.getStartDate());
-        }
-    }
+//    private void setEndDateAndStartDate(${pckFirstUpperCamel} ${pckNameLower}, DataUploadDto dataUploadInput) {
+//        if (!CommonUtil.isNullOrEmpty(dataUploadInput.getPeriod())) {
+//            String previousPeriod = DateUtils.getPreviousPeriod(dataUploadInput.getPeriod());
+//            try {
+//                Date startDate = DateUtils.str2MonthYear(previousPeriod, 26);
+//                ${pckNameLower}.setStartDate(startDate);
+//                Date endDate = DateUtils.str2MonthYear(dataTestInput.getPeriod(), 25);
+//                ${pckNameLower}.setEndDate(endDate);
+//            } catch (ParseException e) {
+//                //khong lam gi
+//            }
+//        } else if (dataUploadInput.getStartDate() != null) {
+//            ${pckNameLower}.setStartDate(dataUploadInput.getStartDate());
+//        }
+//    }
 
     /**
-     * Duyệt test
+     * Duyệt ${pckNameLower}
      *
      * @param request, username, roles  Kênh truyền vào
      * @return
@@ -145,137 +144,121 @@ public class ${pckFirstUpperCamel}CommonServiceImpl implements ${pckFirstUpperCa
     @Override
     public String approve(ApproveRequest request, String username, List<String> roles) throws BusinessException {
         String result = "";
-        Optional<Document> oDocument = documentRepository.findById(request.getId());
-        if (!oDocument.isPresent()) {
+        Optional<${pckFirstUpperCamel}> o${pckFirstUpperCamel} = ${pckNameLower}Repository.findById(request.getId());
+        if (!o${pckFirstUpperCamel}.isPresent()) {
             throw new BusinessException(ValidateErrorCode.RECORD_NOT_EXIST);
         }
 
-        Document document = oDocument.get();
-        if (document.isErrorStatus()) {
+        ${pckFirstUpperCamel} ${pckNameLower} = o${pckFirstUpperCamel}.get();
+        if (${pckNameLower}.isErrorStatus()) {
             throw new BusinessException(ValidateErrorCode.UNAVAILABLE_STATUS);
         }
-        if (!CommonUtil.checkAvailableStatus(document.getStatus(), roles)) {
+        if (!CommonUtil.checkAvailableStatus(${pckNameLower}.getStatus(), roles)) {
             throw new BusinessException(ValidateErrorCode.UNAVAILABLE_STATUS);
         }
 
-        document.setApprover(username);
-        document.setModifiedDate(new Date());
+        ${pckNameLower}.setApprover(username);
+        ${pckNameLower}.setModifiedDate(new Date());
         String status = "";
-        int approveLevel = DocumentTypeEnum.APPR_IMP_ADJUSTMENT.getCode().equals(document.getType()) ? Constants.APPROVE_THREE_LEVEL : Constants.APPROVE_TWO_LEVEL;
-        status = CommonUtil.getNextStatus(request.getApproveType(), request.getApprover(), roles, approveLevel);
-        if (CommonUtil.isNullOrEmpty(status)) {
-            throw new BusinessException(ValidateErrorCode.UNAVAILABLE_STATUS);
-        }
-        document.setStatus(status);
+//        int approveLevel = ${pckFirstUpperCamel}TypeEnum.?.getCode().equals(${pckNameLower}.getType()) ? Constants.APPROVE_THREE_LEVEL : Constants.APPROVE_TWO_LEVEL;
+//        status = CommonUtil.getNextStatus(request.getApproveType(), request.getApprover(), roles, approveLevel);
+//        if (CommonUtil.isNullOrEmpty(status)) {
+//            throw new BusinessException(ValidateErrorCode.UNAVAILABLE_STATUS);
+//        }
+//        ${pckNameLower}.setStatus(status);
 
-        TestCommonAdapter svc = null;
-        if (document.getType() != null) {
-            svc = serviceMap.get(document.getType());
+        ${pckFirstUpperCamel}CommonAdapter svc = null;
+        if (${pckNameLower}.getType() != null) {
+            svc = serviceMap.get(${pckNameLower}.getType());
         }
         if (svc != null) {
-            svc.updateStatus(document.getId(), status);
+            svc.updateStatus(${pckNameLower}.getId(), status);
             if (request.getApproveType().equals("create")) {
-                result = "Đã gửi phê duyệt thành công";
+                result = ApproveMessageEnum.SEND_APPROVE_SUCCESS.getValue();
             } else if (request.getApproveType().equals("approve")) {
-                result = "Đã phê duyệt thành công";
+                result = ApproveMessageEnum.APPROVE_SUCCESS.getValue();
             } else if (request.getApproveType().equals("reject")) {
-                result = "Từ chối thành công";
-                document.setRejectReason(request.getRejectReason());
+                result = ApproveMessageEnum.REJECT_SUCCESS.getValue();
+                ${pckNameLower}.setRejectReason(request.getRejectReason());
             }
             if (StatusConfiguration.ACTIVE.getStatus().equals(status)) {
-                document.setApprovedDate(new Date());
-                svc.updateApproveInfo(document.getId(), document.getApprover(), document.getApprovedDate());
+                ${pckNameLower}.setApprovedDate(new Date());
+                svc.updateApproveInfo(${pckNameLower}.getId(), ${pckNameLower}.getApprover(), ${pckNameLower}.getApprovedDate());
             }
         }
-        documentRepository.saveAndFlush(document);
+        ${pckNameLower}Repository.saveAndFlush(${pckNameLower});
         return result;
     }
 
     /**
-     * Xóa test
+     * Xóa ${pckNameLower}
      *
      * @param id, roles  Kênh truyền vào
      * @return
      */
     @Override
     public String delete(Long id, List<String> roles) throws BusinessException {
-        Optional<Document> oDocument = documentRepository.findById(id);
-        if (oDocument.isPresent()) {
-            Document document = oDocument.get();
-            document.setModifiedDate(new Date());
-
-            if (CommonUtil.checkStatusBeforeDelete(document.getStatus(), roles)) {
-                document.setStatus(StatusConfiguration.DELETE.getStatus());
-                documentRepository.saveAndFlush(document);
-                if (document.getType() != null) {
-                    TestCommonAdapter svc = serviceMap.get(document.getType());
-                    if (svc != null) {
-                        svc.updateStatus(document.getId(), StatusConfiguration.DELETE.getStatus());
-                    }
-                }
-                return "Xoá tài liệu thành công";
-            } else {
-                throw new BusinessException(ValidateErrorCode.UNAVAILABLE_STATUS);
-            }
-        } else {
+        Optional<${pckFirstUpperCamel}> o${pckFirstUpperCamel} = ${pckNameLower}Repository.findById(id);
+        if (!o${pckFirstUpperCamel}.isPresent()) {
             throw new BusinessException(ValidateErrorCode.RECORD_NOT_EXIST);
         }
+        if (!CommonUtil.checkStatusBeforeDelete(o${pckFirstUpperCamel}.get().getStatus(), roles)) {
+            throw new BusinessException(ValidateErrorCode.UNAVAILABLE_STATUS);
+        }
+
+        ${pckFirstUpperCamel} ${pckNameLower} = o${pckFirstUpperCamel}.get();
+        ${pckNameLower}.setModifiedDate(new Date());
+        ${pckNameLower}.setStatus(StatusConfiguration.DELETE.getStatus());
+        ${pckNameLower}Repository.saveAndFlush(${pckNameLower});
+        if (${pckNameLower}.getType() != null) {
+            ${pckFirstUpperCamel}CommonAdapter svc = serviceMap.get(${pckNameLower}.getType());
+            if (svc != null) {
+                svc.updateStatus(${pckNameLower}.getId(), StatusConfiguration.DELETE.getStatus());
+            }
+        }
+        return "Xoá tài liệu thành công";
     }
 
     /**
-     * Tải thông tin test
+     * Tải thông tin ${pckNameLower}
      *
      * @param id Kênh truyền vào
      * @return
      */
     @Override
     public Object download(Long id) throws BusinessException, IOException {
-        Optional<Document> oDocument = documentRepository.findById(id);
-        if (!oDocument.isPresent()) {
+        Optional<${pckFirstUpperCamel}> o${pckFirstUpperCamel} = ${pckNameLower}Repository.findById(id);
+        if (!o${pckFirstUpperCamel}.isPresent()) {
             throw new BusinessException(ValidateErrorCode.NO_DOCUMENT_DATA);
         }
-        Document document = oDocument.get();
+        ${pckFirstUpperCamel} ${pckNameLower} = o${pckFirstUpperCamel}.get();
         InputStream inputStream = null;
-        if (document.getType() != null) {
-            TestCommonAdapter svc = serviceMap.get(document.getType());
+        if (${pckNameLower}.getType() != null) {
+            ${pckFirstUpperCamel}CommonAdapter svc = serviceMap.get(${pckNameLower}.getType());
             if (svc != null) {
-                CheckTestDto<?> checkTestResult = svc.checkTest(document);
-                inputStream = new ByteArrayInputStream(checkTestResult.getData());
+                CheckUploadDto<?> checkUploadResult = svc.checkUpload(${pckNameLower});
+                inputStream = new ByteArrayInputStream(checkUploadResult.getData());
             }
         }
 
-        HttpHeaders headers = new HttpHeaders();
-        List<String> headerName = new ArrayList<>();
-        headerName.add("*");
-        headers.setAccessControlExposeHeaders(headerName);
-        if (document.getFileName().endsWith("xls")) {
-            headers.setContentType(MediaType.parseMediaType("application/vnd.ms-excel"));
-        } else {
-            headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        if (inputStream == null) {
+            throw new BusinessException(ValidateErrorCode.ERROR_OCCURRED_DOWNLOAD);
         }
-        String name = StringUtil.removeAccents(document.getReportName());
-        headers.add("content-disposition", "attachment;documentName=" + name);
-        if (document.getFileName().endsWith("xls")) {
-            headers.setContentDispositionFormData(name, name + ".xls");
-        } else {
-            headers.setContentDispositionFormData(name, name + ".xlsx");
-        }
-        headers.add("documentName", name);
-        headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
-        return new ResponseEntity<>(inputStream != null ? inputStream.readAllBytes() : null, headers, HttpStatus.OK);
+        HttpHeaders headers = ExcelUtil.createHeaderExport(${pckNameLower}.getFileName(), ${pckNameLower}.getReportName());
+        return new ResponseEntity<>(inputStream.readAllBytes(), headers, HttpStatus.OK);
     }
 
     /**
-     * Lấy thông tin test
+     * Lấy thông tin ${pckNameLower}
      *
      * @param id Kênh truyền vào
      * @return
      */
     @Override
-    public Document findById(Long id) {
-        Optional<Document> oDocument = documentRepository.findById(id);
-        if (oDocument.isPresent()) {
-            return oDocument.get();
+    public ${pckFirstUpperCamel} findById(Long id) {
+        Optional<${pckFirstUpperCamel}> o${pckFirstUpperCamel} = ${pckNameLower}Repository.findById(id);
+        if (o${pckFirstUpperCamel}.isPresent()) {
+            return o${pckFirstUpperCamel}.get();
         } else {
             return null;
         }
@@ -288,52 +271,51 @@ public class ${pckFirstUpperCamel}CommonServiceImpl implements ${pckFirstUpperCa
      * @return
      */
     @Override
-    public Paging<DocumentDto> advanceSearch(SearchDocumentRequest searchRequest, Pageable pageable, List<String> roles) {
-        Page<Document> page;
-        List<Specification<Document>> specList = getAdvanceSearchSpecList(searchRequest, roles);
+    public Paging<${pckFirstUpperCamel}Dto> advanceSearch(Search${pckFirstUpperCamel}Request searchRequest, Pageable pageable, List<String> roles) {
+        Page<${pckFirstUpperCamel}> page;
+        List<Specification<${pckFirstUpperCamel}>> specList = getAdvanceSearchSpecList(searchRequest, roles);
         if (!specList.isEmpty()) {
-            Specification<Document> spec = specList.get(0);
+            Specification<${pckFirstUpperCamel}> spec = specList.get(0);
             for (int i = 1; i < specList.size(); i++) {
                 spec = spec.and(specList.get(i));
             }
-            page = documentRepository.findAll(spec, pageable);
+            page = ${pckNameLower}Repository.findAll(spec, pageable);
         } else {
-            page = documentRepository.findByType(searchRequest.getType(), pageable);
+            page = ${pckNameLower}Repository.findAll(pageable);
         }
 
-        Paging<DocumentDto> documentDtoPaging = new Paging<>();
-        documentDtoPaging.setItems(CommonUtil.toListObject(page.getContent(), DocumentDto.class));
-        documentDtoPaging.setPageSize(pageable.getPageSize());
-        documentDtoPaging.setPageNum(pageable.getPageNumber());
-        documentDtoPaging.setTotalCount(page.getTotalElements());
-        return documentDtoPaging;
+        Paging<${pckFirstUpperCamel}Dto> result = new Paging<>();
+        result.setItems(CommonUtil.toListObject(page.getContent(), ${pckFirstUpperCamel}Dto.class));
+        result.setPageSize(pageable.getPageSize());
+        result.setPageNum(pageable.getPageNumber());
+        result.setTotalCount(page.getTotalElements());
+        return result;
     }
 
-    private List<Specification<Document>> getAdvanceSearchSpecList(SearchDocumentRequest searchRequest, List<String> roles) {
-        List<Specification<Document>> specList = new ArrayList<>();
+    private List<Specification<${pckFirstUpperCamel}>> getAdvanceSearchSpecList(Search${pckFirstUpperCamel}Request searchRequest, List<String> roles) {
+        List<Specification<${pckFirstUpperCamel}>> specList = new ArrayList<>();
+#foreach($ppt in $pptPck)
+#if($textUtils.wordsToSnakeUpper($ppt.nameColumn) == 'STATUS')
         specList.add(SearchUtil.notEq("status", "D"));
-        if (!CommonUtil.isNullOrEmpty(searchRequest.getType()) && !roles.contains("GDV")) {
-            specList.add(SearchUtil.eq("errorStatus", false));
+#break
+#end
+#end
+#foreach($ppt in $pptPck)
+#if($ppt.canFilter == 'TRUE')
+#if($ppt.nameDisplay.isBlank())
+#else
+#if($textUtils.wordsToSnakeUpper($ppt.type) == 'STRING')
+        if (!CommonUtil.isNullOrEmpty(searchRequest.get$textUtils.toPascalCase($ppt.nameProperty)())) {
+            specList.add(SearchUtil.eq("$textUtils.wordsToCamel($ppt.nameProperty)", searchRequest.get$textUtils.toPascalCase($ppt.nameProperty)()));
         }
-        if (!CommonUtil.isNullOrEmpty(searchRequest.getLine())) {
-            specList.add(SearchUtil.eq("line", searchRequest.getLine()));
+#else
+        if (searchRequest.get$textUtils.toPascalCase($ppt.nameProperty)() != null) {
+            specList.add(SearchUtil.eq("$textUtils.wordsToCamel($ppt.nameProperty)", searchRequest.get$textUtils.toPascalCase($ppt.nameProperty)()));
         }
-        if (!CommonUtil.isNullOrEmpty(searchRequest.getType())) {
-            specList.add(SearchUtil.eq("type", searchRequest.getType()));
-        }
-        if (!CommonUtil.isNullOrEmpty(searchRequest.getCreator())) {
-            specList.add(SearchUtil.eq("creator", searchRequest.getCreator()));
-        }
-        if (!CommonUtil.isNullOrEmpty(searchRequest.getStatus())) {
-            specList.add(SearchUtil.eq("status", searchRequest.getStatus()));
-        }
-        if (searchRequest.getCreatedDate() != null) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(searchRequest.getCreatedDate());
-            calendar.add(Calendar.DATE, 1);
-            Date nextDay = calendar.getTime();
-            specList.add(SearchUtil.bw("createdDate", searchRequest.getCreatedDate(), nextDay));
-        }
+#end
+#end
+#end
+#end
         return specList;
     }
 }

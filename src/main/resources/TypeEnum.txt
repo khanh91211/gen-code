@@ -2,6 +2,10 @@ package ${basePackageImport}.model.enumeration;
 
 import lombok.Getter;
 
+/**
+ * @author khanhtd
+ * @Date 2023
+ */
 public enum ${pckFirstUpperCamel}TypeEnum {
 #if($listEntityModule.isEmpty() || $listEntityModule.size() == 0)
 #else

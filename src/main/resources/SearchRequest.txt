@@ -5,26 +5,26 @@ import lombok.Setter;
 import lombok.ToString;
 import io.swagger.annotations.ApiModelProperty;
 
-#foreach($ppt in $ppts)
+#foreach($ppt in $pptPck)
 #if($ppt.type == 'Date' && $ppt.canFilter == 'TRUE')
 import java.util.Date;
 #break
 #end
 #end
-#foreach($ppt in $ppts)
+#foreach($ppt in $pptPck)
 #if(($ppt.min != '' || $ppt.max != '') && $ppt.canFilter == 'TRUE')
 import javax.validation.constraints.Size;
 #break
 #end
 #end
-#foreach($ppt in $ppts)
+#foreach($ppt in $pptPck)
 #if($ppt.required == 'TRUE' && $ppt.canFilter == 'TRUE')
 import javax.validation.constraints.NotNull;
 #break
 #end
 #end
 #set($uniqueImpAnnotation = [])
-#foreach($ppt in $ppts)
+#foreach($ppt in $pptPck)
 #if($ppt.annotation == '' && $uniqueImpAnnotation.contains($ppt.annotation))
 #elseif($ppt.canFilter == 'TRUE')
 #set($addAnnotation = $uniqueImpAnnotation.add($ppt.annotation))
@@ -40,8 +40,8 @@ import ${basePackageImport}.model.annotation.$textUtils.wordsToCamelFirstUpper($
 @Getter
 @Setter
 @ToString(includeFieldNames = true)
-public class ${ettFirstUpperCamel}Request {
-#foreach($ppt in $ppts)
+public class Search${ettFirstUpperCamel}Request {
+#foreach($ppt in $pptPck)
 #if($ppt.canFilter == 'TRUE')
 #if($ppt.min != '' && $ppt.min != ' ' && $ppt.max != '' && $ppt.max != ' ')
     @Size(min = ${ppt.min}, max = ${ppt.max})

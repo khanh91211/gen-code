@@ -1,39 +1,43 @@
 package ${basePackage}.${pckNameLower}.ctrl;
 
-import java.util.List;
-
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import org.springframework.http.HttpStatus;
+import ${basePackageImport}.core.base.BaseController;
 import ${basePackageImport}.core.util.SearchUtil;
 import ${basePackageImport}.core.util.RequestUtil;
-import ${basePackage}.${ettNameLower}.service.${ettFirstUpperCamel}Service;
+import ${basePackage}.${ettNameLower}.service.${pckFirstUpperCamel}CommonService;
 import ${basePackageImport}.model.Paging;
 import ${basePackageImport}.model.enumeration.SortOrderEnum;
 import ${basePackageImport}.model.dto.exception.BusinessException;
 import ${basePackageImport}.model.dto.SuccessResponse;
 import ${basePackageImport}.model.dto.request.ApproveRequest;
 import ${basePackageImport}.model.dto.response.UploadFileResponse;
-import ${basePackageImport}.model.entity.${pckNameLower}.${ettFirstUpperCamel};
-import ${basePackageImport}.model.dto.request.${ettFirstUpperCamel}Request;
-import ${basePackageImport}.model.dto.${pckNameLower}.${ettFirstUpperCamel}Dto;
+import ${basePackageImport}.model.entity.${pckNameLower}.${pckFirstUpperCamel};
+import ${basePackageImport}.model.dto.${pckNameLower}.Search${pckFirstUpperCamel}Request;
+import ${basePackageImport}.model.dto.${pckNameLower}.${pckFirstUpperCamel}Dto;
 
 /**
- * Basic ${ettFirstUpperCamel} CRUD APIs
+ * Basic ${pckFirstUpperCamel} CRUD APIs
  * @author KhanhTD
- *
+ * @Date 2023
  */
 @RestController
-@RequestMapping("/v1.0/ch/${ettRequestMapping}")
-@Tag(name = "${ettFirstUpperCamel} Controller")
-public class ${ettFirstUpperCamel}Ctrl extends BaseController {
+@RequestMapping("/v1.0/ch/${pckRequestMapping}")
+@Tag(name = "${pckFirstUpperCamel} Controller")
+public class ${pckFirstUpperCamel}Ctrl extends BaseController {
     @Autowired
     private ${pckFirstUpperCamel}CommonService ${pckNameLower}Service;
 
@@ -45,7 +49,7 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
         * @return
         * @throws BusinessException
     */
-    @ApiOperation(value = "Api upload ${ettNameCamel}")
+    @ApiOperation(value = "Api upload ${pckNameLower}")
     @PostMapping(value = "/upload")
     @ResponseBody
     public SuccessResponse<UploadFileResponse> upload(
@@ -60,7 +64,7 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
         * @return
         * @throws BusinessException
     */
-    @ApiOperation(value = "Api approve ${ettNameCamel}")
+    @ApiOperation(value = "Api approve ${pckNameLower}")
     @PostMapping(value = "/approve")
     @ResponseBody
     public SuccessResponse<String> approve(@Valid @RequestBody ApproveRequest request) throws BusinessException {
@@ -69,11 +73,11 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
 
     /**
         * Download by id
-        * @param id
+        * @param ${ettNameLower}Id
         * @return
         * @throws BusinessException
     */
-    @ApiOperation(value = "Api download ${ettNameCamel}")
+    @ApiOperation(value = "Api download ${pckNameLower}")
     @GetMapping(value = "/download")
     @ResponseStatus(HttpStatus.OK)
     public Object download(@RequestParam("id") Long ${ettNameLower}Id) throws IOException, BusinessException {
@@ -82,28 +86,28 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
 
     /**
        * Delete by id
-       * @param id ${ettFirstUpperCamel}
+       * @param id ${pckNameLower}
        * @return
        * @throws BusinessException
     */
-    @ApiOperation("Delete ${ettNameCamel}")
-    @DeleteMapping("/{id}/delete")
-    public SuccessResponse<Object> delete(@Valid @PathVariable String id) throws BusinessException {
-        return RequestUtil.ok(${pckNameLower}Service.delete(id, this.getRoles));
+    @ApiOperation("Delete ${pckNameLower}")
+    @PostMapping("/{id}/delete")
+    public SuccessResponse<Object> delete(@Valid @PathVariable(value = "id") Long id) throws BusinessException {
+        return RequestUtil.ok(${pckNameLower}Service.delete(id, this.getRoles()));
     }
 
     /**
-        * Advance search ${ettNameCamel}
+        * Advance search ${pckNameLower}
         * @param request
         * @param page
         * @param size
         * @param sort
         * @param order
-        * @return Paged ${ettNameCamel}
+        * @return Paged ${pckNameLower}
     */
-    @ApiOperation("Search ${ettNameCamel}")
+    @ApiOperation("Search ${pckFirstUpperCamel}")
     @PostMapping("/advance-search")
-    public SuccessResponse<Paging<${ettFirstUpperCamel}Dto>> advanceSearch(
+    public SuccessResponse<Paging<${pckFirstUpperCamel}Dto>> advanceSearch(
             @Valid @RequestBody Search${ettFirstUpperCamel}Request request,
             @PositiveOrZero @RequestParam(required = false, defaultValue = "0") @ApiParam(example = "0") Integer page,
             @Positive @RequestParam(required = false) @ApiParam(example = "10") @Max(100) Integer size,
@@ -111,18 +115,18 @@ public class ${ettFirstUpperCamel}Ctrl extends BaseController {
             @RequestParam(required = false) @ApiParam(example = "DESC") SortOrderEnum order
     ) {
         Pageable pageable = SearchUtil.getPageableFromParam(page, size, sort, order);
-        return RequestUtil.ok(${pckNameLower}Service.advanceSearch(request, pageable, this.getRoles));
+        return RequestUtil.ok(${pckNameLower}Service.advanceSearch(request, pageable, this.getRoles()));
     }
 
     /**
-        * Detail ${ettNameCamel}
+        * Detail ${pckNameLower}
         * @param id
-        * @return ${ettFirstUpperCamel}
+        * @return ${pckNameLower}
     */
-    @ApiOperation(value = "Api detail ${ettNameCamel}")
+    @ApiOperation(value = "Api detail ${pckNameLower}")
     @GetMapping(value = "/{id}")
     @ResponseBody
-    public SuccessResponse<${ettFirstUpperCamel}> findById(@PathVariable("id") Long id) {
+    public SuccessResponse<${pckFirstUpperCamel}> findById(@PathVariable("id") Long id) {
         return RequestUtil.ok(${pckNameLower}Service.findById(id));
     }
 }

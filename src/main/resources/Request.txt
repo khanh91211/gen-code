@@ -37,6 +37,10 @@ import ${basePackageImport}.model.annotation.$textUtils.wordsToCamelFirstUpper($
 #end
 #end
 
+/**
+ * @author khanhtd
+ * @Date 2023
+ */
 @Getter
 @Setter
 @ToString(includeFieldNames = true)

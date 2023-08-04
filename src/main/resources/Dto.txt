@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import io.swagger.annotations.ApiModelProperty;
 
 #foreach($ppt in $ppts)
 #if($ppt.type == 'Date')
@@ -12,6 +13,10 @@ import java.util.Date;
 #end
 #end
 
+/**
+ * @author khanhtd
+ * @Date 2023
+ */
 @Getter
 @Setter
 @AllArgsConstructor

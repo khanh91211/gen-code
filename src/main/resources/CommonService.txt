@@ -4,7 +4,7 @@ import ${basePackageImport}.model.Paging;
 import ${basePackageImport}.model.dto.${pckNameLower}.${ettFirstUpperCamel}Dto;
 import ${basePackageImport}.model.dto.exception.BusinessException;
 import ${basePackageImport}.model.dto.request.ApproveRequest;
-import ${basePackageImport}.model.dto.request.Search${ettFirstUpperCamel}Request;
+import ${basePackageImport}.model.dto.${pckNameLower}.Search${ettFirstUpperCamel}Request;
 import ${basePackageImport}.model.dto.response.UploadFileResponse;
 import ${basePackageImport}.model.entity.${pckNameLower}.${ettFirstUpperCamel};
 import org.springframework.data.domain.Pageable;
@@ -13,6 +13,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * @author khanhtd
+ * @Date 2023
+ */
 public interface ${pckFirstUpperCamel}CommonService {
 
     UploadFileResponse upload(MultipartFile file, String data, Long id, String username) throws IOException, BusinessException;
@@ -21,9 +25,9 @@ public interface ${pckFirstUpperCamel}CommonService {
 
     String delete(Long id, List<String> roles) throws BusinessException;
 
-    Object download(Long documentId) throws BusinessException, IOException;
+    Object download(Long ${pckNameLower}Id) throws BusinessException, IOException;
 
-    Document findById(Long id);
+    ${pckFirstUpperCamel} findById(Long id);
 
-    Paging<DocumentDto> advanceSearch(Search${ettFirstUpperCamel}Request searchRequest, Pageable pageable, List<String> roles);
+    Paging<${pckFirstUpperCamel}Dto> advanceSearch(Search${ettFirstUpperCamel}Request searchRequest, Pageable pageable, List<String> roles);
 }
