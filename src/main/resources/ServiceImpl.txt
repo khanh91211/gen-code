@@ -61,7 +61,7 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
     public static final int LAST_COL_NUM = ${headerSize};
 #else
 
-    public static final int LAST_ROW_NUM = 0;
+    public static final int LAST_COL_NUM = 0;
 #end
 #if($!{lstHeaderString})
 
@@ -110,7 +110,7 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
                     }
                 }
 
-                Cell errorCell = modifiedRow.createCell(LAST_ROW_NUM + 1, CellType.STRING);
+                Cell errorCell = modifiedRow.createCell(LAST_COL_NUM + 1, CellType.STRING);
                 if (nextOriginRow.getRowNum() == 0) {
                     errorCell.setCellValue("Error");
                 }
@@ -121,7 +121,7 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
 
                 boolean errorCellValueIsNull = false;
                 ${ettFirstUpperCamel} book = new ${ettFirstUpperCamel}();
-                for (int columnIndex = FIRST_ROW_NUM; columnIndex <= LAST_ROW_NUM; columnIndex++) {
+                for (int columnIndex = FIRST_COL_NUM; columnIndex <= LAST_COL_NUM; columnIndex++) {
                     Cell originCell = nextOriginRow.getCell(columnIndex);
                     Cell modifiedCell = modifiedRow.createCell(columnIndex);
                     Object cellValue = ExcelUtil.getCellValue(originCell);
@@ -227,7 +227,7 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
 
     @Override
     @Transactional(rollbackFor = BusinessException.class)
-    public boolean saveList(List<?> input, String username) {
+    public boolean saveList(List<?> input) {
         List<${ettFirstUpperCamel}> list = CommonUtil.toListObject(input, ${ettFirstUpperCamel}.class);
         int batchSize = 5000;
 #set($uniqueFieldName = [])

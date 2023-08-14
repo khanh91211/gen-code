@@ -281,30 +281,30 @@ public class GenCodeApplication {
                             StringWriter writer = new StringWriter();
                             Velocity.evaluate(context, writer, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                             // In kết quả
-                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writer.toString());
-                        }else if ("TRUE".equals(ett.getGenCtrl())) {
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), ett.getEntityKey() + " " + typeClass, writer.toString());
+                        } else if ("TRUE".equals(ett.getGenCtrl())) {
                             typeClass = "Ctrl";
                             StringWriter writer = new StringWriter();
                             Velocity.evaluate(context, writer, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                             // In kết quả
-                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writer.toString());
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), ett.getEntityKey() + " " + typeClass, writer.toString());
                         }
                         if ("TRUE".equals(ett.getGenEntity())) {
                             typeClass = "Entity";
                             StringWriter writer = new StringWriter();
                             Velocity.evaluate(context, writer, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                             // In kết quả
-                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()), writer.toString());
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), ett.getEntityKey(), writer.toString());
                             typeClass = "Dto";
                             StringWriter writerDto = new StringWriter();
                             Velocity.evaluate(context, writerDto, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                             // In kết quả
-                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writerDto.toString());
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), ett.getEntityKey() + typeClass, writerDto.toString());
                             typeClass = "Request";
                             StringWriter writerRq = new StringWriter();
                             Velocity.evaluate(context, writerRq, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                             // In kết quả
-                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writerRq.toString());
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), ett.getEntityKey() + " " + typeClass, writerRq.toString());
 
                         }
                         if ("TRUE".equals(ett.getGenService())) {
@@ -312,13 +312,13 @@ public class GenCodeApplication {
                             StringWriter writerTypeEnum = new StringWriter();
                             Velocity.evaluate(context, writerTypeEnum, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                             // In kết quả
-                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), "enum".toLowerCase(), TextUtils.wordsToNoSpace(pck.getNameEn()) + typeClass, writerTypeEnum.toString());
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), "enum".toLowerCase(), pck.getNameEn() + " Type Enum", writerTypeEnum.toString());
                             if (!ett.getEntityKey().equalsIgnoreCase(pck.getNameEn())) {
                                 typeClass = "ServiceImpl";
                                 StringWriter writerImpl = new StringWriter();
                                 Velocity.evaluate(context, writerImpl, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                                 // In kết quả
-                                exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), "Service/impl".toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writerImpl.toString());
+                                exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), "Service/impl".toLowerCase(), ett.getEntityKey() + typeClass, writerImpl.toString());
                             }
                         }
                         if ("TRUE".equals(ett.getGenRepo())) {
@@ -326,7 +326,7 @@ public class GenCodeApplication {
                             StringWriter writer = new StringWriter();
                             Velocity.evaluate(context, writer, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                             // In kết quả
-                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), TextUtils.wordsToNoSpace(ett.getEntityKey()) + typeClass, writer.toString());
+                            exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(ett.getEntityKey()), typeClass.toLowerCase(), ett.getEntityKey() + typeClass, writer.toString());
                         }
                     }
                 }
@@ -336,23 +336,23 @@ public class GenCodeApplication {
                     StringWriter writerSearchRq = new StringWriter();
                     Velocity.evaluate(context, writerSearchRq, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                     // In kết quả
-                    exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(pck.getNameEn()), "Request".toLowerCase(), "Search" + TextUtils.wordsToNoSpace(pck.getNameEn()) + "Request", writerSearchRq.toString());
+                    exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(pck.getNameEn()), "Request".toLowerCase(), "Search " + pck.getNameEn() + " Request", writerSearchRq.toString());
                 }
                 String typeClass = "CommonService";
                 StringWriter writerComService = new StringWriter();
                 Velocity.evaluate(context, writerComService, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                 // In kết quả
-                exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(pck.getNameEn()), "Service".toLowerCase(), TextUtils.wordsToNoSpace(pck.getNameEn()) + typeClass, writerComService.toString());
+                exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(pck.getNameEn()), "Service".toLowerCase(), pck.getNameEn() + " " + typeClass, writerComService.toString());
                 typeClass = "Adapter";
                 StringWriter writerAdapter = new StringWriter();
                 Velocity.evaluate(context, writerAdapter, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                 // In kết quả
-                exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(pck.getNameEn()), "Service/" + typeClass.toLowerCase(), TextUtils.wordsToNoSpace(pck.getNameEn()) + "CommonAdapter", writerAdapter.toString());
+                exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(pck.getNameEn()), "Service/" + typeClass.toLowerCase(), pck.getNameEn() + " CommonAdapter", writerAdapter.toString());
                 typeClass = "CommonServiceImpl";
                 StringWriter writerComServiceImpl = new StringWriter();
                 Velocity.evaluate(context, writerComServiceImpl, "gen" + typeClass, readResource(typeClass + ".txt", Charsets.UTF_8));
                 // In kết quả
-                exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(pck.getNameEn()), "Service/impl".toLowerCase(), TextUtils.wordsToNoSpace(pck.getNameEn()) + typeClass, writerComServiceImpl.toString());
+                exportFile(TextUtils.wordsToLowerCase(pck.getNameEn()), TextUtils.wordsToLowerCase(pck.getNameEn()), "Service/impl".toLowerCase(), pck.getNameEn() + " " + typeClass, writerComServiceImpl.toString());
             }
         }
     }
@@ -421,7 +421,7 @@ public class GenCodeApplication {
             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
             osw.write(contentFile);
             osw.close();
-            System.out.println("File exported successfully! - " + fileName);
+            System.out.println("File exported successfully! - " + TextUtils.toPascalCase(fileName));
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Failed to export file.");
