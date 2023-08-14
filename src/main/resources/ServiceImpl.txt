@@ -55,10 +55,10 @@ public class ${ettFirstUpperCamel}ServiceImpl implements ${pckFirstUpperCamel}Co
 #set($codeEnum = $textUtils.wordsToSnakeUpper(${ppt.lineKey}).concat("_").concat($textUtils.wordsToSnakeUpper(${ppt.typeKey})).concat("_").concat($textUtils.wordsToSnakeUpper(${ppt.entityKey})))
 #break
 #end
-    public static final int FIRST_ROW_NUM = 0;
+    public static final int FIRST_COL_NUM = 0;
 #if($!{headerSize})
 
-    public static final int LAST_ROW_NUM = ${headerSize};
+    public static final int LAST_COL_NUM = ${headerSize};
 #else
 
     public static final int LAST_ROW_NUM = 0;

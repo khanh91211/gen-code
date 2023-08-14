@@ -416,7 +416,7 @@ public class GenCodeApplication {
 
         //export file code
         String sourcePath = packagePath
-                + "/" + fileName + ".java";
+                + "/" + TextUtils.toPascalCase(fileName) + ".java";
         try (FileOutputStream fos = new FileOutputStream(sourcePath)) {
             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
             osw.write(contentFile);
