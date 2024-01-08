@@ -6,7 +6,6 @@ public class AnnotationDto {
     private String value;
 
     //get set
-
     public String getNameEn() {
         return nameEn;
     }
