@@ -145,7 +145,6 @@
 		</plugins>
 	</build>
 	<modules>
-		<module>fw-security</module>
 		<module>fw-app</module>
 		<module>fw-gateway</module>
 		<module>fw-common</module>

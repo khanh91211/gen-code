@@ -51,15 +51,15 @@
 		<AsyncRoot level="info" includeLocation="true">
 			<AppenderRef ref="ConsoleAppender" />
 		</AsyncRoot>
-		<!-- <AsyncLogger name="aspect.config.com.fw.core.ExceptionTraceAspect"
+		<!-- <AsyncLogger name="aspect.config.com.fw.common.ExceptionTraceAspect"
 			level="info" additivity="false"> <AppenderRef ref="ConsoleAppender" /> <AppenderRef 
-			ref="exceptionKafkaAppender" /> </AsyncLogger> <AsyncLogger name="aspect.config.com.fw.core.MethodProfileAspect"
+			ref="exceptionKafkaAppender" /> </AsyncLogger> <AsyncLogger name="aspect.config.com.fw.common.MethodProfileAspect"
 			level="debug" additivity="false"> <AppenderRef ref="ConsoleAppender" /> <AppenderRef 
-			ref="profileKafkaAppender" /> </AsyncLogger> <AsyncLogger name="interceptor.config.com.fw.core.RequestBodyInterceptor"
+			ref="profileKafkaAppender" /> </AsyncLogger> <AsyncLogger name="interceptor.config.com.fw.common.RequestBodyInterceptor"
 			level="debug" additivity="false"> <AppenderRef ref="ConsoleAppender" /> <AppenderRef 
-			ref="requestKafkaAppender" /> </AsyncLogger> <AsyncLogger name="interceptor.config.com.fw.core.RequestHandlerInterceptor"
+			ref="requestKafkaAppender" /> </AsyncLogger> <AsyncLogger name="interceptor.config.com.fw.common.RequestHandlerInterceptor"
 			level="debug" additivity="false"> <AppenderRef ref="ConsoleAppender" /> <AppenderRef 
-			ref="requestKafkaAppender" /> </AsyncLogger> <AsyncLogger name="interceptor.config.com.fw.core.ResponseBodyInterceptor"
+			ref="requestKafkaAppender" /> </AsyncLogger> <AsyncLogger name="interceptor.config.com.fw.common.ResponseBodyInterceptor"
 			level="debug" additivity="false"> <AppenderRef ref="ConsoleAppender" /> <AppenderRef 
 			ref="responseKafkaAppender" /> </AsyncLogger> <Logger name="org.apache.kafka" 
 			level="WARN" /> -->
