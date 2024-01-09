@@ -1,0 +1,56 @@
+#---------- Application properties ---------
+server:
+  port: 8880
+  tomcat:
+    threads:
+      max: 700
+spring:
+  application:
+    name: wproductivity-ch-gateway
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+      file-size-threshold: 20KB
+  main:
+    web-application-type: reactive
+
+ribbon:
+  ReadTimeout: 300000
+  ConnectTimeout: 300000
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 300000
+  threadpool:
+    default:
+      maxQueueSize: 1000
+
+#---------- Routes properties ---------
+mb:
+  host: http://localhost
+  routes:
+    - id: wproductivity-ch-catalog
+      uri: ${mb.host}:8883
+      predicates: /v1.0/ch/catalog/**
+    - id: wproductivity-ch-configuration
+      uri: ${mb.host}:8885
+      predicates: /v1.0/ch/configuration/**
+    - id: wproductivity-ch-document
+      uri: ${mb.host}:8887
+      predicates: /v1.0/ch/document/**
+    - id: wproductivity-ch-security
+      uri: ${mb.host}:8881
+      predicates: /v1.0/auth/**
+    - id: wproductivity-ch-report
+      uri: ${mb.host}:8889
+      predicates: /v1.0/ch/report/**
+    - id: wproductivity-ch-system
+      uri: ${mb.host}:8891
+      predicates: /v1.0/ch/history/**
+    - id: wproductivity-hc-document
+      uri: ${mb.host}:8887
+      predicates: /v1.0/ch/hc-document/**
